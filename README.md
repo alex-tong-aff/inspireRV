@@ -1,5 +1,7 @@
-MCU: CH32V003F4P6
-IDE: MounRiver
+MCU: CH32V003F4P6  
+IDE: MounRiver Studio  
+Use "User Folder"  
+****
 
 **InspireRV Command**
 
@@ -106,7 +108,7 @@ Loading Page
 Saving Page
 9: Back
 
----------------------------------------------------------------------
+****
 For all variables, if not jump, all canbe used with Drawing
 E.g:
 ```
