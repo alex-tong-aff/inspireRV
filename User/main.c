@@ -1600,7 +1600,7 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     }
     // draw number
     // number at number list index 0-9 
-    font_draw(font_list[button],(color_t){.r = 100, .g = 0, .b = 0}, 18); //third row center , forth column
+    font_draw(font_list[button],(color_t){.r = 100, .g = 0, .b = 0}, 17); //third row center
 
     // show confirm and cancel on second row 0(red),7(green)
     set_color(8, (color_t){.r = 0, .g = 100, .b = 0});
