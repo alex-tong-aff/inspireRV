@@ -1606,16 +1606,17 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     set_color(8, (color_t){.r = 0, .g = 100, .b = 0});
     set_color(15, (color_t){.r = 100, .g = 0, .b = 0});
     WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    int8_t confirm_button = no_button_pressed;
     while (1) {
-        int8_t button = matrix_pressed_two();
-        if(button != 8 || button != 15) continue;
+        Delay_Ms(200);// cannot put at last as there is continue
+        confirm_button = matrix_pressed_two();
+        if(confirm_button != 8 || confirm_button != 15) continue;
                 //restore original led
         for(int i = 0; i < NUM_LEDS; i++){
             led_array[i] = temp_led_array[i];
         }
         WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
-        return button == 8; // true: confirm, false: cancel
-        Delay_Ms(200);
+        return confirm_button == 8; // true: confirm, false: cancel
     }    
 
 }
