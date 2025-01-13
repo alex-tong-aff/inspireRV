@@ -87,9 +87,9 @@ void painting_routine(void);
 void iconShow(void);
 //void display_stored_paints(void);
 
-
-void choose_save_page(app_selected app_current);
-void choose_load_page(app_selected app_current);
+void choose_page(app_selected app_current, bool save_or_load);
+#define choose_save_page(app_current) choose_page(app_current, true)
+#define choose_load_page(app_current) choose_page(app_current, false)
 void led_display_paint_page_status(app_selected app_current, bool save_or_load);
 bool confirm_save_load(int8_t button,bool save_or_load);
 
@@ -1459,138 +1459,82 @@ void any_opcode_exist(uint8_t * opcode_exist) {
     *opcode_exist = 0;
 }
 
-
-void choose_load_page(app_selected app_current) {
-    led_display_paint_page_status(app_current,false);// FALSE: load page
+void choose_page(app_selected app_current, bool save_or_load) {
+    led_display_paint_page_status(app_current, save_or_load);
     int8_t button = no_button_pressed;
-	uint8_t _sizeof_data_aspage = 24, _page_no = 24, _page_addr_begin = 8;
-	if(app_current == rv_paint){
-		_sizeof_data_aspage = sizeof_paint_data_aspage;
-		_page_no = paint_page_no;
-		_page_addr_begin = paint_addr_begin;
-	} else if(app_current == rv_code){
-		_sizeof_data_aspage = sizeof_opcode_data_aspage;
-		_page_no = opcode_page_no;
-		_page_addr_begin = opcode_addr_begin;
-	}
+    uint8_t _sizeof_data_aspage = 24, _page_no = 24, _page_addr_begin = 8;
+    if(app_current == rv_paint){
+        _sizeof_data_aspage = sizeof_paint_data_aspage;
+        _page_no = paint_page_no;
+        _page_addr_begin = paint_addr_begin;
+    } else if(app_current == rv_code){
+        _sizeof_data_aspage = sizeof_opcode_data_aspage;
+        _page_no = opcode_page_no;
+        _page_addr_begin = opcode_addr_begin;
+    }
+
     while (1) {
         button = matrix_pressed_two();
-        if (button != no_button_pressed
-            && confirm_save_load(button,false)
+        if (button != no_button_pressed 
+        && confirm_save_load(button, save_or_load)
         ) {
-            if (!is_page_used(button * _sizeof_data_aspage + _page_no +
-                             _page_addr_begin)) {
-                printf("Page %d is not used\n", button);
-                // Fill the screen with red to indicate error
-                fill_color((color_t){.r = 100, .g = 0, .b = 0});
-                WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+            if(save_or_load) {
+                if (is_page_used(button * _sizeof_data_aspage + _page_no + _page_addr_begin)) {
+                    printf("Page %d already used\n", button);
+                }
+                printf("Selected page %d\n", button);
+                for (int i = 0; i < NUM_LEDS; i++){
+                    set_color(i, canvas[i].color);
+                }
+                if(app_current == rv_paint) save_paint(button, led_array, 1);
+                else if(app_current == rv_code) save_opCode(button, opCodeToStored);
+                printf("Paint saved\n");
                 Delay_Ms(1000);
-                led_display_paint_page_status(app_current,false);// FALSE: load page
-                continue;
-            }
-            printf("Selected page %d\n", button);
-
-            /*if(appChosen == rv_paint)
-                load_paint(button, led_array, 1);
-            else if(appChosen == rv_code)
-                load_opCode(button, opCodeToStored);*/
-            // Put led_array to canvas
-            if(app_current == rv_paint){
-                load_paint(button, led_array, 1);
-                for (int i = 0; i < NUM_LEDS; i++) {
-                    canvas[i].color = led_array[i];
+                break;
+            } else {
+                if (!is_page_used(button * _sizeof_data_aspage + _page_no + _page_addr_begin)) {
+                    printf("Page %d is not used\n", button);
+                    fill_color((color_t){.r = 100, .g = 0, .b = 0});
+                    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+                    Delay_Ms(1000);
+                    led_display_paint_page_status(app_current,false);
+                    continue;
                 }
-                //flushCanvas();
-            }
-            else if(app_current == rv_code){
-                load_opCode(button, opCodeToStored);
-                for (int i = 0; i < sizeof(opCodeToStored); i++) {
-                    opCodeStorage[i/7][i%7][0] = ((opCodeToStored[i]&0x01));
-                    opCodeStorage[i/7][i%7][1] = ((opCodeToStored[i]&0x02)>>1);
-                    opCodeStorage[i/7][i%7][2] = ((opCodeToStored[i]&0x04)>>2);
-                    opCodeStorage[i/7][i%7][3] = ((opCodeToStored[i]&0x08)>>3);
-                    opCodeStorage[i/7][i%7][4] = ((opCodeToStored[i]&0x10)>>4);
-                    opCodeStorage[i/7][i%7][5] = ((opCodeToStored[i]&0x20)>>5);
-                    opCodeStorage[i/7][i%7][6] = ((opCodeToStored[i]&0x40)>>6);
-                    opCodeStorage[i/7][i%7][7] = ((opCodeToStored[i]&0x80)>>7);
+                printf("Selected page %d\n", button);
+                if(app_current == rv_paint){
+                    load_paint(button, led_array, 1);
+                    for (int i = 0; i < NUM_LEDS; i++){
+                        canvas[i].color = led_array[i];
+                    }
+                } else if(app_current == rv_code){
+                    load_opCode(button, opCodeToStored);
+                    for (int i = 0; i < sizeof(opCodeToStored); i++) {
+                        opCodeStorage[i/7][i%7][0] = (opCodeToStored[i] & 0x01);
+                        opCodeStorage[i/7][i%7][1] = ((opCodeToStored[i] & 0x02) >> 1);
+                        opCodeStorage[i/7][i%7][2] = ((opCodeToStored[i] & 0x04) >> 2);
+                        opCodeStorage[i/7][i%7][3] = ((opCodeToStored[i] & 0x08) >> 3);
+                        opCodeStorage[i/7][i%7][4] = ((opCodeToStored[i] & 0x10) >> 4);
+                        opCodeStorage[i/7][i%7][5] = ((opCodeToStored[i] & 0x20) >> 5);
+                        opCodeStorage[i/7][i%7][6] = ((opCodeToStored[i] & 0x40) >> 6);
+                        opCodeStorage[i/7][i%7][7] = ((opCodeToStored[i] & 0x80) >> 7);
+                    }
+                    currentPage = 1;
+                    toCodingSpace(currentPage);
                 }
-                currentPage = 1;
-                toCodingSpace(currentPage);
+                printf("Paint load\n");
+                Delay_Ms(1000);
+                break;
             }
-
-            printf("Paint load\n");
-            Delay_Ms(1000);
-            break;
-        }
-        else{
+        } else {
             if (JOY_9_pressed()){
-                printf("Exit Loading\n");
+                printf("Exit %s\n", save_or_load ? "Saving" : "Loading");
                 break;
             }
         }
         Delay_Ms(200);
     }
     flushCanvas();
-    //flushCanvas();
-    /*for (int i = 0; i < NUM_LEDS; i++) {
-        set_color_no_div(i, canvas[i].color);
-    }
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);*/
 }
-
-
-void choose_save_page(app_selected app_current) {
-    led_display_paint_page_status(app_current,true);// TRUE: save page
-    int8_t button = no_button_pressed;
-	uint8_t _sizeof_data_aspage = 24, _page_no = 24, _page_addr_begin = 8;
-	if(app_current == rv_paint){
-		_sizeof_data_aspage = sizeof_paint_data_aspage;
-		_page_no = paint_page_no;
-		_page_addr_begin = paint_addr_begin;
-	} else if(app_current == rv_code){
-		_sizeof_data_aspage = sizeof_opcode_data_aspage;
-		_page_no = opcode_page_no;
-		_page_addr_begin = opcode_addr_begin;
-	}
-    while (1) {
-        button = matrix_pressed_two();
-        if (button != no_button_pressed
-            && confirm_save_load(button,true)
-        ) {
-            if (is_page_used(button * _sizeof_data_aspage + _page_no +
-                             _page_addr_begin)) {
-                printf("Page %d already used\n", button);
-                // Overwrite save
-            }
-            printf("Selected page %d\n", button);
-            // Put canvas to led_array
-            for (int i = 0; i < NUM_LEDS; i++) {
-                // set_color_no_div(i, canvas[i].color);
-                set_color(i, canvas[i].color);
-            }
-
-            if(app_current == rv_paint)
-                save_paint(button, led_array, 1);
-            else if(app_current == rv_code)
-                save_opCode(button, opCodeToStored);
-
-            printf("Paint saved\n");
-            Delay_Ms(1000);
-            break;
-        }
-        else{
-            if (JOY_9_pressed()){
-                printf("Exit Saving\n");
-                break;
-            }
-        }
-        Delay_Ms(200);
-    }
-    flushCanvas();
-    //clear();
-    //WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
-}
-
 void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
     clear();
     // show S if save_or_load else show L
@@ -1641,6 +1585,11 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
 bool confirm_save_load(int8_t button,bool save_or_load){
     clear();
     printf("Confirm Save\n");
+    //temp store original led
+    color_t temp_led_array[NUM_LEDS] = {0};
+    for(int i = 0; i < NUM_LEDS; i++){
+        temp_led_array[i] = led_array[i];
+    }
     // show S if save_or_load else show L
     // orange for S, blue for L
     if (save_or_load) {
@@ -1659,13 +1608,16 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
     while (1) {
         int8_t button = matrix_pressed_two();
-        if (button == 8){
-            return true;
-        }else if (button == 15){
-            return false;
-        }   
+        if(button != 8 || button != 15) continue;
+                //restore original led
+        for(int i = 0; i < NUM_LEDS; i++){
+            led_array[i] = temp_led_array[i];
+        }
+        WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+        return button == 8; // true: confirm, false: cancel
         Delay_Ms(200);
-    }
+    }    
+
 }
 
 void erase_all_paint_saves(void) {
