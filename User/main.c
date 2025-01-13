@@ -91,6 +91,7 @@ void iconShow(void);
 void choose_save_page(app_selected app_current);
 void choose_load_page(app_selected app_current);
 void led_display_paint_page_status(app_selected app_current, bool save_or_load);
+bool confirm_save_load(int8_t button,bool save_or_load);
 
 // RV Code defines
 /******************************************/
@@ -1458,22 +1459,6 @@ void any_opcode_exist(uint8_t * opcode_exist) {
     *opcode_exist = 0;
 }
 
-void confirm_load(){
-    printf("Confirm Load\n");
-
-    while (1) {
-        if (JOY_1_pressed()) {
-            printf("Load confirmed\n");
-            break;
-        }
-        else if (JOY_9_pressed()) {
-            printf("Load canceled\n");
-            break;
-        }
-        Delay_Ms(200);
-    }
-}
-
 
 void choose_load_page(app_selected app_current) {
     led_display_paint_page_status(app_current,false);// FALSE: load page
@@ -1568,7 +1553,9 @@ void choose_save_page(app_selected app_current) {
 	}
     while (1) {
         button = matrix_pressed_two();
-        if (button != no_button_pressed) {
+        if (button != no_button_pressed
+            && confirm_save_load(button,true)
+        ) {
             if (is_page_used(button * _sizeof_data_aspage + _page_no +
                              _page_addr_begin)) {
                 printf("Page %d already used\n", button);
@@ -1647,6 +1634,36 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
 
 
     WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+}
+
+bool confirm_save_load(int8_t button,bool save_or_load){
+    clear();
+    printf("Confirm Save\n");
+    // show S if save_or_load else show L
+    // orange for S, blue for L
+    if (save_or_load) {
+        font_draw(font_L,(color_t){.r = 100, .g = 0, .b = 0}, 21); //third row center , leftest
+    }else{
+        // use font_5 for S , as they are same in this scale
+        font_draw(font_5,(color_t){.r = 100, .g = 50, .b = 0}, 21);//third row cente, leftest
+    }
+    // draw number
+    // number at number list index 0-9 
+    font_draw(font_list[button],(color_t){.r = 100, .g = 0, .b = 0}, 18); //third row center , forth column
+
+    // show confirm and cancel on second row 0(red),7(green)
+    set_color(8, (color_t){.r = 0, .g = 100, .b = 0});
+    set_color(15, (color_t){.r = 100, .g = 0, .b = 0});
+    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    while (1) {
+        int8_t button = matrix_pressed_two();
+        if (button == 8){
+            return true;
+        }else if (button == 15){
+            return false;
+        }   
+        Delay_Ms(200);
+    }
 }
 
 void erase_all_paint_saves(void) {
