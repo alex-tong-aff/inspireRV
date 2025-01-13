@@ -1475,7 +1475,9 @@ void choose_load_page(app_selected app_current) {
 	}
     while (1) {
         button = matrix_pressed_two();
-        if (button != no_button_pressed) {
+        if (button != no_button_pressed
+            && confirm_save_load(button,false)
+        ) {
             if (!is_page_used(button * _sizeof_data_aspage + _page_no +
                              _page_addr_begin)) {
                 printf("Page %d is not used\n", button);
@@ -1492,7 +1494,6 @@ void choose_load_page(app_selected app_current) {
                 load_paint(button, led_array, 1);
             else if(appChosen == rv_code)
                 load_opCode(button, opCodeToStored);*/
-
             // Put led_array to canvas
             if(app_current == rv_paint){
                 load_paint(button, led_array, 1);
