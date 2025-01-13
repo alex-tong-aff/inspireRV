@@ -5,7 +5,7 @@
 #include "./ch32v003fun/ch32v003_i2c.h"
 #include "./data/colors.h"
 #include "./ch32v003fun/driver.h"
-//#include "./data/fonts.h"
+#include "./data/fonts.h"
 #include "./data/music.h"
 #include "./ch32v003fun/ws2812b_simple.h"
 
@@ -90,7 +90,7 @@ void iconShow(void);
 
 void choose_save_page(app_selected app_current);
 void choose_load_page(app_selected app_current);
-void led_display_paint_page_status(app_selected app_current);
+void led_display_paint_page_status(app_selected app_current, bool save_or_load);
 
 // RV Code defines
 /******************************************/
@@ -1458,8 +1458,25 @@ void any_opcode_exist(uint8_t * opcode_exist) {
     *opcode_exist = 0;
 }
 
+void confirm_load(){
+    printf("Confirm Load\n");
+
+    while (1) {
+        if (JOY_1_pressed()) {
+            printf("Load confirmed\n");
+            break;
+        }
+        else if (JOY_9_pressed()) {
+            printf("Load canceled\n");
+            break;
+        }
+        Delay_Ms(200);
+    }
+}
+
+
 void choose_load_page(app_selected app_current) {
-    led_display_paint_page_status(app_current);
+    led_display_paint_page_status(app_current,false);// FALSE: load page
     int8_t button = no_button_pressed;
 	uint8_t _sizeof_data_aspage = 24, _page_no = 24, _page_addr_begin = 8;
 	if(app_current == rv_paint){
@@ -1481,7 +1498,7 @@ void choose_load_page(app_selected app_current) {
                 fill_color((color_t){.r = 100, .g = 0, .b = 0});
                 WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
                 Delay_Ms(1000);
-                led_display_paint_page_status(app_current);
+                led_display_paint_page_status(app_current,false);// FALSE: load page
                 continue;
             }
             printf("Selected page %d\n", button);
@@ -1537,7 +1554,7 @@ void choose_load_page(app_selected app_current) {
 
 
 void choose_save_page(app_selected app_current) {
-    led_display_paint_page_status(app_current);
+    led_display_paint_page_status(app_current,true);// TRUE: save page
     int8_t button = no_button_pressed;
 	uint8_t _sizeof_data_aspage = 24, _page_no = 24, _page_addr_begin = 8;
 	if(app_current == rv_paint){
@@ -1585,8 +1602,17 @@ void choose_save_page(app_selected app_current) {
     //WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
 }
 
-void led_display_paint_page_status(app_selected app_current) {
+void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
     clear();
+    // show S if save_or_load else show L
+    // orange for S, blue for L
+    if (save_or_load) {
+        font_draw(font_L,(color_t){.r = 100, .g = 0, .b = 0}, 19); //third row center , forth column
+    }else{
+        // use font_5 for S , as they are same in this scale
+        font_draw(font_5,(color_t){.r = 100, .g = 50, .b = 0}, 19);//third row cente, forth
+    }
+
     if(app_current == rv_paint){
         for (uint16_t _paint_page_no = paint_page_no;
              _paint_page_no < paint_page_no_max + paint_page_no;
