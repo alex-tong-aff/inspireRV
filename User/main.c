@@ -1564,7 +1564,8 @@ void choose_save_page(app_selected app_current) {
             printf("Selected page %d\n", button);
             // Put canvas to led_array
             for (int i = 0; i < NUM_LEDS; i++) {
-                set_color_no_div(i, canvas[i].color);
+                // set_color_no_div(i, canvas[i].color);
+                set_color(i, canvas[i].color);
             }
 
             if(app_current == rv_paint)
