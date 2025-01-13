@@ -1586,10 +1586,6 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     clear();
     printf("Confirm Save\n");
     //temp store original led
-    color_t temp_led_array[NUM_LEDS] = {0};
-    for(int i = 0; i < NUM_LEDS; i++){
-        temp_led_array[i] = led_array[i];
-    }
     // show S if save_or_load else show L
     // orange for S, blue for L
     if (save_or_load) {
@@ -1608,16 +1604,13 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
     int8_t confirm_button = no_button_pressed;
     while (1) {
-        Delay_Ms(200);// cannot put at last as there is continue
         confirm_button = matrix_pressed_two();
-        if(confirm_button != 8 || confirm_button != 15) continue;
-                //restore original led
-        for(int i = 0; i < NUM_LEDS; i++){
-            led_array[i] = temp_led_array[i];
-        }
-        WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
-        return confirm_button == 8; // true: confirm, false: cancel
+        printf("Confirm button: %d %d\n", confirm_button, confirm_button == 8);
+        if(confirm_button == 8 || confirm_button == 15) break;
+        Delay_Ms(200);
     }    
+    // WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    return (confirm_button == 8); // true: confirm, false: cancel
 
 }
 
