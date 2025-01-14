@@ -46,9 +46,11 @@
 // initialize file storage structure for 32kb/512pages
 // first 8 pages are used for status
 void init_storage(void);
-void load_data(uint16_t no, uint8_t * data, uint8_t sizeofdata, uint8_t is_icon);
-void save_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // save paint data to eeprom, paint 0 stored in page ?? (out of page 0 to 511)
+void save_data(uint16_t no, uint8_t * data, uint8_t sizeof_data_aspage,uint8_t sizeof_data, uint8_t is_icon);
+void load_data(uint16_t no, uint8_t * data, uint8_t sizeof_data, uint8_t is_icon);
+// void save_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // save paint data to eeprom, paint 0 stored in page ?? (out of page 0 to 511)
 // void load_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // load paint data from eeprom, paint 0 stored in page ?? (out of page 0 to 511)
+#define save_paint(paint_no,data,is_icon) save_data(paint_no,(uint8_t*)data,sizeof_paint_data_aspage,sizeof_paint_data,is_icon)
 #define load_paint(paint_no,data,is_icon) load_data(paint_no,(uint8_t*)data,sizeof_paint_data,is_icon)
 void set_page_status(uint16_t page_no, uint8_t status); // set page status to 0 or 1
 void reset_storage(void);   // reset to default storage status
@@ -56,8 +58,9 @@ void print_status_storage(void);    // print storage data to console
 uint8_t is_page_used(uint16_t page_no); // check if page[x] is already used
 uint8_t is_storage_initialized(void);   // check if already initialized data, aka init_status_data is set
 // save opcode data to eeprom, paint 0 stored in page ?? (out of page 0 to 511)
-void save_opCode(uint16_t opcode_no, uint8_t * data);
+// void save_opCode(uint16_t opcode_no, uint8_t * data);
 // void load_opCode(uint16_t opcode_no, uint8_t * data);
+#define save_opCode(opcode_no,data) save_data(opcode_no,data,sizeof_opcode_data_aspage,sizeof_opcode_data,0)
 #define load_opCode(opcode_no,data) load_data(opcode_no,data,sizeof_opcode_data,0)
 
 uint16_t calculate_page_no(uint16_t paint_no, uint8_t is_icon);
@@ -1355,51 +1358,73 @@ uint16_t calculate_page_no(uint16_t paint_no, uint8_t is_icon) {
     }
 }
 
-void save_paint(uint16_t paint_no, color_t * data, uint8_t is_icon) {
-    if (paint_no < 0 || paint_no > paint_addr_end) {
-        printf("Invalid paint number %d\n", paint_no);
+void save_data(uint16_t no, uint8_t * data, uint8_t sizeof_data_aspage,uint8_t sizeof_data, uint8_t is_icon){
+    if (no < 0 || no > paint_addr_end) {
+        printf("Invalid paint number %d\n", no);
         printf("DEBUG: %d\n", __LINE__);
         while (1)
             ;
     }
-    uint16_t page_no_start = calculate_page_no(paint_no, is_icon);
-    for (uint16_t i = page_no_start; i < page_no_start + sizeof_paint_data_aspage; i++) {
+    uint16_t page_no_start = calculate_page_no(no, is_icon);
+    for (uint16_t i = page_no_start; i < page_no_start + sizeof_data_aspage; i++) {
         if (is_page_used(i)) {
-            printf("Paint %d already used, overwriting\n", paint_no);
+            printf("Paint %d already used, overwriting\n", no);
             Delay_Ms(500);
         }
         set_page_status(i, 1);
     }
     i2c_result_e err = i2c_write_pages(EEPROM_ADDR, page_no_start * page_size,
-        I2C_REGADDR_2B, (uint8_t *)data, sizeof_paint_data);
+        I2C_REGADDR_2B, data, sizeof_data);
     printf("Save paint result: %d\n", err);
     Delay_Ms(3);
-    printf("Paint %d saved\n", paint_no);
+    printf("Paint %d saved\n", no);
 }
 
+// void save_paint(uint16_t paint_no, color_t * data, uint8_t is_icon) {
+//     if (paint_no < 0 || paint_no > paint_addr_end) {
+//         printf("Invalid paint number %d\n", paint_no);
+//         printf("DEBUG: %d\n", __LINE__);
+//         while (1)
+//             ;
+//     }
+//     uint16_t page_no_start = calculate_page_no(paint_no, is_icon);
+//     for (uint16_t i = page_no_start; i < page_no_start + sizeof_paint_data_aspage; i++) {
+//         if (is_page_used(i)) {
+//             printf("Paint %d already used, overwriting\n", paint_no);
+//             Delay_Ms(500);
+//         }
+//         set_page_status(i, 1);
+//     }
+//     i2c_result_e err = i2c_write_pages(EEPROM_ADDR, page_no_start * page_size,
+//         I2C_REGADDR_2B, (uint8_t *)data, sizeof_paint_data);
+//     printf("Save paint result: %d\n", err);
+//     Delay_Ms(3);
+//     printf("Paint %d saved\n", paint_no);
+// }
 
-void save_opCode(uint16_t opcode_no, uint8_t * data) {
-    if (opcode_no < 0 || opcode_no > page_status_addr_end) {
-        printf("Invalid paint number %d\n", opcode_no);
-        printf("DEBUG: %d\n", __LINE__);
-        while (1);
-    }
-    uint16_t page_no_start = calculate_page_no(opcode_no, 0);
-    for (uint16_t i = page_no_start; i < page_no_start + sizeof_opcode_data_aspage; i++) {
-        if (is_page_used(i)) {
-            printf("Opcode %d already used, overwriting\n", opcode_no);
-            Delay_Ms(500);
-        }
-        set_page_status(i, 1);
-    }
-    i2c_result_e err = i2c_write_pages(EEPROM_ADDR, page_no_start * page_size,
-        I2C_REGADDR_2B, (uint8_t *)data, sizeof_opcode_data);
-    printf("Save Opcode result: %d\n", err);
-    Delay_Ms(3);
-    printf("Opcode %d saved\n", opcode_no);
-}
 
-void load_data(uint16_t no, uint8_t * data, uint8_t sizeofdata, uint8_t is_icon) {
+// void save_opCode(uint16_t opcode_no, uint8_t * data) {
+//     if (opcode_no < 0 || opcode_no > page_status_addr_end) {
+//         printf("Invalid paint number %d\n", opcode_no);
+//         printf("DEBUG: %d\n", __LINE__);
+//         while (1);
+//     }
+//     uint16_t page_no_start = calculate_page_no(opcode_no, 0);
+//     for (uint16_t i = page_no_start; i < page_no_start + sizeof_opcode_data_aspage; i++) {
+//         if (is_page_used(i)) {
+//             printf("Opcode %d already used, overwriting\n", opcode_no);
+//             Delay_Ms(500);
+//         }
+//         set_page_status(i, 1);
+//     }
+//     i2c_result_e err = i2c_write_pages(EEPROM_ADDR, page_no_start * page_size,
+//         I2C_REGADDR_2B, (uint8_t *)data, sizeof_opcode_data);
+//     printf("Save Opcode result: %d\n", err);
+//     Delay_Ms(3);
+//     printf("Opcode %d saved\n", opcode_no);
+// }
+
+void load_data(uint16_t no, uint8_t * data, uint8_t sizeof_data, uint8_t is_icon) {
         if (no < 0 || no > paint_addr_end) {
         printf("Invalid paint number %d\n", no);
         printf("DEBUG: %d\n", __LINE__);
@@ -1416,7 +1441,7 @@ void load_data(uint16_t no, uint8_t * data, uint8_t sizeofdata, uint8_t is_icon)
             ;
     }
     i2c_result_e err = i2c_read_pages(EEPROM_ADDR, page_no_start * page_size,
-    I2C_REGADDR_2B, data, sizeofdata);
+    I2C_REGADDR_2B, data, sizeof_data);
     printf("Load paint result: %d\n", err);
     Delay_Ms(3);
     printf("Paint %d loaded\n", no);
