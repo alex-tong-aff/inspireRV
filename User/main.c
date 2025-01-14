@@ -1642,14 +1642,18 @@ void brightness_control(void)
     // show the current brightness
     // on 2nd row of the screen 
     // led divider = selected B * 5 / 2
-    // i.e. original led divider(10) is at the forth slot
+    // i.e. original led divider(10) is at the fifth slot
     flushCanvas();
     int8_t button = no_button_pressed;
     clear();
     while (1) {
         // show the current brightness
         uint8_t i;
-        for(i = 15;i>(ledDivider*2/5 + 7);i--){
+        //((ledDivider*2+1)/5 + 6): hacky way to show the bar correctly
+        // the idea is to recover the slot number
+        // but as float values are truncated, you will never reach some slot
+        // Therefore, some hacky way is needed
+        for(i = 15;i>((ledDivider*2+1)/5 + 6);i--){
                 set_color(i, (color_t){.r = 50, .g = 150, .b = 255});
         }
         for(;i>=8;i--){
