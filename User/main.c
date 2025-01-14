@@ -1193,17 +1193,16 @@ void painting_routine(void) {
         printf("User input: %d\n",user_input);
         // user sets canvas color
         if(canvas[user_input].layer == CLEARROUND_LAYER){
-            canvas[user_input].layer = FOREGROUND_LAYER;
             canvas[user_input].color = foreground;
         }
         else if (canvas[user_input].layer == FOREGROUND_LAYER) {
-            canvas[user_input].layer = BACKGROUND_LAYER;
             canvas[user_input].color = background;
         }
-        else {
-            canvas[user_input].layer = CLEARROUND_LAYER;
+        else {// CLEARROUND_LAYER
             canvas[user_input].color = clearground;
         }
+        canvas[user_input].layer += 1;
+        canvas[user_input].layer %= (CLEARROUND_LAYER+1);
         printf("Canvas[%d] set to %s layer\n", user_input,
             canvas[user_input].layer == FOREGROUND_LAYER ? "FOREGROUND" : canvas[user_input].layer == BACKGROUND_LAYER ? "BACKGROUND":"CLEARGROUND");
         printf("Canvas color set to R:%d G:%d B:%d\n", canvas[user_input].color.r,
