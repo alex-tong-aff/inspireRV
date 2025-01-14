@@ -1586,12 +1586,6 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
 bool confirm_save_load(int8_t button,bool save_or_load){
     clear();
     printf("Confirm Save\n");
-    //temp store original led
-    color_t temp_led_array[NUM_LEDS] = {0};
-
-    for (int i = 0; i < NUM_LEDS; i++) {
-        temp_led_array[i] = led_array[i];
-    }
     // show S if save_or_load else show L
     // orange for S, blue for L
     if (save_or_load) {
@@ -1615,11 +1609,6 @@ bool confirm_save_load(int8_t button,bool save_or_load){
         if(confirm_button == 8 || confirm_button == 15) break;
         Delay_Ms(200);
     }    
-    // restore original led 
-    for (int i = 0; i < NUM_LEDS; i++) {
-        led_array[i] = temp_led_array[i];
-    }
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
     return (confirm_button == 8); // true: confirm, false: cancel
 
 }
