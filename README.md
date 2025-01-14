@@ -67,7 +67,7 @@ moving x-y mapping
 Coding Mode
 ```
 1: Load
-2:
+2: brightness
 3: save
 4: Programming space
 5: Result
@@ -79,7 +79,7 @@ Coding Mode
 Painting Mode
 ```
 1: Load
-2:
+2: brightness
 3: save
 4: Background color selection
 5: 
