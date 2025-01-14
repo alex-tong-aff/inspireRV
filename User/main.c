@@ -618,35 +618,36 @@ void rvCodeRun(uint8_t direct_result){
                         sound_dur = 50+var_line_storage[line_run]*100;
                         break;
                     case _RVCODE_OPCODE_SOUNDFREQ:
-                        switch(var_line_storage[line_run]){
-                            case 0:
-                                sound_freq = NOTE_C4;
-                                break;
-                            case 1:
-                                sound_freq = NOTE_D4;
-                                break;
-                            case 2:
-                                sound_freq = NOTE_E4;
-                                break;
-                            case 3:
-                                sound_freq = NOTE_F4;
-                                break;
-                            case 4:
-                                sound_freq = NOTE_G4;
-                                break;
-                            case 5:
-                                sound_freq = NOTE_A4;
-                                break;
-                            case 6:
-                                sound_freq = NOTE_B4;
-                                break;
-                            case 7:
-                                sound_freq = NOTE_C5;
-                                break;
-                            default:
-                                sound_freq = NOTE_C4;
-                                break;
-                        }
+                        // switch(var_line_storage[line_run]){
+                        //     case 0:
+                        //         sound_freq = NOTE_C4;
+                        //         break;
+                        //     case 1:
+                        //         sound_freq = NOTE_D4;
+                        //         break;
+                        //     case 2:
+                        //         sound_freq = NOTE_E4;
+                        //         break;
+                        //     case 3:
+                        //         sound_freq = NOTE_F4;
+                        //         break;
+                        //     case 4:
+                        //         sound_freq = NOTE_G4;
+                        //         break;
+                        //     case 5:
+                        //         sound_freq = NOTE_A4;
+                        //         break;
+                        //     case 6:
+                        //         sound_freq = NOTE_B4;
+                        //         break;
+                        //     case 7:
+                        //         sound_freq = NOTE_C5;
+                        //         break;
+                        //     default:
+                        //         sound_freq = NOTE_C4;
+                        //         break;
+                        // }
+                        sound_freq = rvCodeNotes[var_line_storage[line_run]];
                         JOY_sound(sound_freq,sound_dur);
                         break;
                     case _RVCODE_OPCODE_PENRGB:
