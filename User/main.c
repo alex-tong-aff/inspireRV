@@ -1761,6 +1761,7 @@ void bucketFill(){
         }
         Delay_Ms(200);
     }
+    color_t indexColor = canvas[index].color;
     int8_t q[NUM_LEDS] = {-1};//note: may optimize the size, if needed
     int8_t back = 1,front=0; 
     bool visited[NUM_LEDS] = { false };
@@ -1775,7 +1776,7 @@ void bucketFill(){
         for(int16_t i = front; i < end;i++){
             int8_t current = q[i%NUM_LEDS];
             front = (front + 1) % NUM_LEDS;
-            if(visited[current] || canvas[current].color.r != canvas[index].color.r || canvas[current].color.g != canvas[index].color.g || canvas[current].color.b != canvas[index].color.b)
+            if(visited[current] || canvas[current].color.r != indexColor.r || canvas[current].color.g != indexColor.g || canvas[current].color.b != indexColor.b)
                 continue;
             visited[current] = true;
             canvas[current].color = FillColor;
