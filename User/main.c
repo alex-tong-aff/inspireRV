@@ -228,6 +228,7 @@ int8_t pointerLocation = 36;
 
 // Brightness control
 // relies on ledDivider from colors.h
+void display_brightness_bar(void);
 void brightness_control(void);
 
 
@@ -1667,15 +1668,7 @@ void erase_all_paint_saves(void) {
 }
 
 /// brightness control
-void brightness_control(void)
-{
-    // show the current brightness
-    // on 2nd row of the screen 
-    // led divider = selected slot * 5
-    // i.e. original led divider(10) is at the forth slot
-    int8_t button = no_button_pressed;
-    clear();
-    while (1) {
+void display_brightness_bar(void){
         // show the current brightness
         uint8_t i;
 
@@ -1684,19 +1677,34 @@ void brightness_control(void)
         }
         for(;i>=8;i--){
                 set_color(i, (color_t){.r = 255, .g = 255, .b = 255});
-        }   
-        // set_color(0,(color_t){ .r=200, .g=0, .b=0});
+        } 
         sendLedArray();
+}
+void brightness_control(void)
+{
+    // show the current brightness
+    // on 2nd row of the screen 
+    // led divider = selected slot * 5
+    // i.e. original led divider(10) is at the forth slot
+    int8_t button = no_button_pressed;
+    clear();
+    set_color(0,(color_t){ .r=200, .g=0, .b=0});
+    display_brightness_bar();
+    while (1) {
+  
+
         button = matrix_pressed_two();
         if(JOY_9_pressed()) break;
         if (button != no_button_pressed) {
-            // if(button==0) break;
+            if(button==0) break;
             if (button < 8 || button > 15) continue;
             ledDivider = (button - 8) * 5 ;
+            display_brightness_bar();
             printf("Brightness: %d\n", ledDivider);
         }
         Delay_Ms(200);
     }
+    
 }
 
 
@@ -1752,7 +1760,6 @@ void bucketFill(){
         }
         Delay_Ms(200);
     }
-    color_t currentColor = canvas[index].color;
     int8_t q[NUM_LEDS] = {-1};//note: may optimize the size, if needed
     uint8_t back = 1,front=0; 
     bool visited[NUM_LEDS] = { false };
@@ -1761,7 +1768,7 @@ void bucketFill(){
         for(uint8_t i = front; i< back;i++){
             int8_t current = q[i];
             front = (front + 1) % NUM_LEDS;
-            if(visited[current] || canvas[current].color.r != currentColor.r || canvas[current].color.g != currentColor.g || canvas[current].color.b != currentColor.b)
+            if(visited[current] || canvas[current].color.r != canvas[index].color.r || canvas[current].color.g != canvas[index].color.g || canvas[current].color.b != canvas[index].color.b)
                 continue;
             visited[current] = true;
             canvas[current].color = FillColor;
