@@ -236,6 +236,9 @@ void displayColorPalette(void);
 void colorPaletteSelection(color_t * selectedColor);
 void logoDisplay(void);
 void red_screen(void);
+// below function reduce hex size
+// by not call send to ws2812b manually but by this function
+void sendLedArray(void); 
 
 typedef struct {
     enum { FOREGROUND_LAYER, BACKGROUND_LAYER, CLEARROUND_LAYER, PAGEGROUND_LAYER } layer;
@@ -264,7 +267,7 @@ int main(void) {
     SystemInit();
     ADC_init();
     clear();
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
     Delay_Ms(delay);
     i2c_init();
     //printf("I2C Initialized\n");
@@ -1111,7 +1114,7 @@ void logoDisplay(void){
         }
     }*/
     //printf("\n");
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
 }
 
 
@@ -1230,7 +1233,7 @@ void iconShow(void){
             led_array[i].b = led_array[i].b / 10;
         }
     }
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
 }
 
 
@@ -1498,7 +1501,7 @@ void choose_page(app_selected app_current, bool save_or_load) {
                 if (!is_page_used(button * _sizeof_data_aspage + _page_no + _page_addr_begin)) {
                     printf("Page %d is not used\n", button);
                     fill_color((color_t){.r = 100, .g = 0, .b = 0});
-                    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+                    sendLedArray();
                     Delay_Ms(1000);
                     led_display_paint_page_status(app_current,false);
                     continue;
@@ -1580,7 +1583,7 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
     }
 
 
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
 }
 
 bool confirm_save_load(int8_t button,bool save_or_load){
@@ -1601,7 +1604,7 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     // show confirm and cancel on second row 0(red),7(green)
     set_color(8, (color_t){.r = 0, .g = 100, .b = 0});
     set_color(15, (color_t){.r = 100, .g = 0, .b = 0});
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
     int8_t confirm_button = no_button_pressed;
     while (1) {
         confirm_button = matrix_pressed_two();
@@ -1676,14 +1679,14 @@ void flushCanvas(void) {
     for (int i = 0; i < NUM_LEDS; i++) {
         set_color(i, canvas[i].color);
     }
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
 }
 
 void displayColorPalette(void) {
     for (int i = 0; i < NUM_LEDS; i++) {
         set_color(i, colors[i]);
     }
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
     printf("Color palette displayed\n");
 }
 
@@ -1705,10 +1708,14 @@ void colorPaletteSelection(color_t * selectedColor) {
 
 void red_screen(void) {
     fill_color((color_t){.r = 100, .g = 0, .b = 0});
-    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    sendLedArray();
 }
 
 void blue_screen(void) {
     fill_color((color_t){.r = 0, .g = 0, .b = 100});
+    sendLedArray();
+}
+
+void sendLedArray(){
     WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
 }
