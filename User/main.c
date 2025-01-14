@@ -1545,38 +1545,35 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
     }else{
         font_draw(font_L,(color_t){.r = 100, .g = 0, .b = 0}, 19); //third row center , forth column
     }
+    uint8_t addr_begin, page_no, page_no_max, sizeof_data_aspage;
     if(app_current == rv_paint){
-        // uint8_t addr_begin = paint_addr_begin; uint8_t page_no = paint_page_no; uint8_t sizeof_data_as_page = sizeof_paint_data_aspage;
-        for (uint16_t _paint_page_no = paint_page_no;
-             _paint_page_no < paint_page_no_max + paint_page_no;
-             _paint_page_no += sizeof_paint_data_aspage) {
-            if (is_page_used(_paint_page_no + paint_addr_begin) &&
-                is_page_used(_paint_page_no + paint_addr_begin + 1) &&
-                is_page_used(_paint_page_no + paint_addr_begin + 2)) {
-                set_color((_paint_page_no - paint_page_no) / sizeof_paint_data_aspage,
+        addr_begin = paint_addr_begin; 
+        page_no = paint_page_no; 
+        page_no_max = paint_page_no_max;
+        sizeof_data_aspage = sizeof_paint_data_aspage;
+    }else if(app_current == rv_code){
+        addr_begin = opcode_addr_begin;
+        page_no = opcode_page_no;
+        page_no_max = opcode_page_no_max;
+        sizeof_data_aspage = sizeof_opcode_data_aspage;
+    }else{
+        return;
+    }
+        for (uint16_t _page_no = page_no;
+             _page_no < page_no_max + page_no;
+             _page_no += sizeof_data_aspage) {
+            if (is_page_used(_page_no + addr_begin) &&
+                is_page_used(_page_no + addr_begin + 1) &&
+                is_page_used(_page_no + addr_begin + 2)) {
+                set_color((_page_no - page_no) / sizeof_data_aspage,
                     color_savefile_exist);
             }
             else {
-                set_color((_paint_page_no - paint_page_no) / sizeof_paint_data_aspage,
+                set_color((_page_no - page_no) / sizeof_data_aspage,
                     color_savefile_empty);
             }
             //printf("Paint page number: %d\n", _paint_page_no);
         }
-    }
-    if(app_current == rv_code){
-        for (uint16_t _opcode_page_no = opcode_page_no;
-             _opcode_page_no < opcode_page_no_max + opcode_page_no;
-             _opcode_page_no += sizeof_opcode_data_aspage) {
-            if (is_page_used(_opcode_page_no + opcode_addr_begin)) {
-                set_color((_opcode_page_no - opcode_page_no) / sizeof_opcode_data_aspage,
-                    color_savefile_exist);
-            }
-            else {
-                set_color((_opcode_page_no - opcode_page_no) / sizeof_opcode_data_aspage,
-                    color_savefile_empty);
-            }
-        }
-    }
 
 
     WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
