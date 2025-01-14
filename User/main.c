@@ -1654,7 +1654,7 @@ void brightness_control(void)
         for(;i<=15;i++){
                 set_color(i, (color_t){.r = 255, .g = 255, .b = 255});
         }   
-        
+        sendLedArray();
         button = matrix_pressed_two();
         if (button != no_button_pressed) {
             if (button < 8 || button > 15) continue;
