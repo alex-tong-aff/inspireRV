@@ -1659,9 +1659,9 @@ void brightness_control(void)
         set_color(0,(color_t){ .r=200, .g=0, .b=0});
         sendLedArray();
         button = matrix_pressed_two();
-        if(button==0) break;
+        if(JOY_9_pressed()) break;
         if (button != no_button_pressed) {
-            if(JOY_9_pressed()) break;
+            if(button==0) break;
             if (button < 8 || button > 15) continue;
             ledDivider = (button - 8) * 5 ;
             printf("Brightness: %d\n", ledDivider);
