@@ -238,7 +238,7 @@ void brightness_control(void);
 
 // Color defines
 void flushCanvas(void);
-void displayColorPalette(void);
+void displayColorPalette(int16_t offsetr, int16_t offsetg, int16_t offsetb);
 void colorPaletteSelection(color_t * selectedColor);
 void bucketFill(void);
 void logoDisplay(void);
@@ -1748,24 +1748,55 @@ void flushCanvas(void) {
     sendLedArray();
 }
 
-void displayColorPalette(void) {
+void displayColorPalette(int16_t offsetr, int16_t offsetg, int16_t offsetb) {
     for (int i = 0; i < NUM_LEDS; i++) {
-        set_color(i, colors[i]);
+        set_color(i, (color_t){
+            .r = abs(((int16_t)colors[i].r + offsetr)%256),
+            .g = abs(((int16_t)colors[i].g + offsetg)%256),
+            .b = abs(((int16_t)colors[i].b + offsetb)%256)
+        });
     }
     sendLedArray();
     // printf("Color palette displayed\n");
 }
 
 void colorPaletteSelection(color_t * selectedColor) {
-    displayColorPalette();
+    int16_t offsetr = 0, offsetg = 0, offsetb = 0;
+    displayColorPalette(0,0,0);
     while (1) {
-        int8_t button = matrix_pressed_two();
-        if(JOY_9_pressed()) break;
-        if (button != no_button_pressed) {
-            *selectedColor = colors[button];
-            break;
-        }
         Delay_Ms(200);
+        int8_t button = matrix_pressed_two();
+        if(JOY_1_pressed()) {
+            offsetr = (offsetr + 10) % 256;
+        }
+        else if(JOY_2_pressed()){
+            offsetg = (offsetg + 10) % 256;
+        }
+        else if(JOY_3_pressed()) {
+            offsetb = (offsetb + 10) % 256;
+        }
+        else if(JOY_4_pressed()) {
+            offsetr = (offsetr - 10) % 256;
+        }
+        else if(JOY_5_pressed()) {
+            offsetg = (offsetg - 10) % 256;
+        }
+        else if(JOY_6_pressed()) {
+            offsetb = (offsetb - 10) % 256;
+        }
+        else if(JOY_9_pressed()) {
+            break;
+        }else if (button != no_button_pressed) {
+            *selectedColor =(color_t){
+            .r = abs(((int8_t)colors[button].r + offsetr)%256),
+            .g = abs(((int8_t)colors[button].g + offsetg)%256),
+            .b = abs(((int8_t)colors[button].b + offsetb)%256)
+        } ;
+            break;
+        }else{
+            continue;
+        }
+        displayColorPalette(offsetr, offsetg, offsetb);
     }
     printf("Selected color: R:%d G:%d B:%d\n", selectedColor->r, selectedColor->g,
         selectedColor->b);

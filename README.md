@@ -112,6 +112,12 @@ Brightness Control Page
 9: Back
 
 Color Selection Page
+1: Increase Red color
+2: Increase Green color
+3: Increase Blue color
+4: Decrease Red color
+5: Decrease Green color
+6: Decrease Blue color
 9: Back
 
 
