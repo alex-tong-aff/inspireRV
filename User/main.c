@@ -1645,6 +1645,7 @@ void brightness_control(void)
     // i.e. original led divider(10) is at the forth slot
     flushCanvas();
     int8_t button = no_button_pressed;
+    clear();
     while (1) {
         // show the current brightness
         uint8_t i;
@@ -1654,9 +1655,11 @@ void brightness_control(void)
         for(;i>=8;i--){
                 set_color(i, (color_t){.r = 255, .g = 255, .b = 255});
         }   
+        set_color(0,(color_t){ .r=200, .g=0, .b=0});
         sendLedArray();
         button = matrix_pressed_two();
         if (button != no_button_pressed) {
+            if(button==0) break;
             if (button < 8 || button > 15) continue;
             ledDivider = (button - 7) * 5 / 2;
             printf("Brightness: %d\n", ledDivider);
