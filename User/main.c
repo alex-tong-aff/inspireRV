@@ -1648,17 +1648,17 @@ void brightness_control(void)
     while (1) {
         // show the current brightness
         uint8_t i;
-        for(i = 8;i<=(ledDivider*2/5 + 8);i++){
+        for(i = 15;i>(ledDivider*2/5 + 7);i--){
                 set_color(i, (color_t){.r = 0, .g = 0, .b = 200});
         }
-        for(;i<=15;i++){
+        for(;i>=8;i--){
                 set_color(i, (color_t){.r = 255, .g = 255, .b = 255});
         }   
         sendLedArray();
         button = matrix_pressed_two();
         if (button != no_button_pressed) {
             if (button < 8 || button > 15) continue;
-            ledDivider = (button - 8) * 5 / 2;
+            ledDivider = (button - 7) * 5 / 2;
             printf("Brightness: %d\n", ledDivider);
         }
         Delay_Ms(200);
