@@ -1541,14 +1541,17 @@ void choose_page(app_selected app_current, bool save_or_load) {
                 } else if(app_current == rv_code){
                     load_opCode(button, opCodeToStored);
                     for (int i = 0; i < sizeof(opCodeToStored); i++) {
-                        opCodeStorage[i/7][i%7][0] = (opCodeToStored[i] & 0x01);
-                        opCodeStorage[i/7][i%7][1] = ((opCodeToStored[i] & 0x02) >> 1);
-                        opCodeStorage[i/7][i%7][2] = ((opCodeToStored[i] & 0x04) >> 2);
-                        opCodeStorage[i/7][i%7][3] = ((opCodeToStored[i] & 0x08) >> 3);
-                        opCodeStorage[i/7][i%7][4] = ((opCodeToStored[i] & 0x10) >> 4);
-                        opCodeStorage[i/7][i%7][5] = ((opCodeToStored[i] & 0x20) >> 5);
-                        opCodeStorage[i/7][i%7][6] = ((opCodeToStored[i] & 0x40) >> 6);
-                        opCodeStorage[i/7][i%7][7] = ((opCodeToStored[i] & 0x80) >> 7);
+                        for(int j=0;j<8;j++){
+                            opCodeStorage[i/7][i%7][j] = (opCodeToStored[i]>>j)&0x01;
+                        }
+                        // opCodeStorage[i/7][i%7][0] = (opCodeToStored[i] & 0x01);
+                        // opCodeStorage[i/7][i%7][1] = ((opCodeToStored[i] & 0x02) >> 1);
+                        // opCodeStorage[i/7][i%7][2] = ((opCodeToStored[i] & 0x04) >> 2);
+                        // opCodeStorage[i/7][i%7][3] = ((opCodeToStored[i] & 0x08) >> 3);
+                        // opCodeStorage[i/7][i%7][4] = ((opCodeToStored[i] & 0x10) >> 4);
+                        // opCodeStorage[i/7][i%7][5] = ((opCodeToStored[i] & 0x20) >> 5);
+                        // opCodeStorage[i/7][i%7][6] = ((opCodeToStored[i] & 0x40) >> 6);
+                        // opCodeStorage[i/7][i%7][7] = ((opCodeToStored[i] & 0x80) >> 7);
                     }
                     currentPage = 1;
                     toCodingSpace(currentPage);
@@ -1613,7 +1616,6 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
 
 bool confirm_save_load(int8_t button,bool save_or_load){
     clear();
-    printf("Confirm Save\n");
     // show S if save_or_load else show L
     // orange for S, blue for L
     if (save_or_load) {
@@ -1716,7 +1718,7 @@ void displayColorPalette(void) {
         set_color(i, colors[i]);
     }
     sendLedArray();
-    printf("Color palette displayed\n");
+    // printf("Color palette displayed\n");
 }
 
 void colorPaletteSelection(color_t * selectedColor) {
