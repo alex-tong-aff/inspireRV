@@ -111,6 +111,10 @@ Saving Page
 Brightness Control Page
 9: Back
 
+Color Selection Page
+9: Back
+
+
 ****
 For all variables, if not jump, all canbe used with Drawing
 E.g:
