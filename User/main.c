@@ -1751,6 +1751,7 @@ void bucketFill(){
     color_t FillColor;
     colorPaletteSelection(&FillColor);
     int8_t index = 0;
+    Delay_Ms(500);
     while(1){
         int8_t button = matrix_pressed_two();
         if(JOY_9_pressed()) return;
@@ -1761,12 +1762,18 @@ void bucketFill(){
         Delay_Ms(200);
     }
     int8_t q[NUM_LEDS] = {-1};//note: may optimize the size, if needed
-    uint8_t back = 1,front=0; 
+    int8_t back = 1,front=0; 
     bool visited[NUM_LEDS] = { false };
     q[0] = index;
     while(abs(back-front) > 0){
-        for(uint8_t i = front; i< back;i++){
-            int8_t current = q[i];
+        int16_t end;
+        if(back > front){
+            end = back;
+        }else{
+            end = back + NUM_LEDS;
+        }
+        for(int16_t i = front; i < end;i++){
+            int8_t current = q[i%NUM_LEDS];
             front = (front + 1) % NUM_LEDS;
             if(visited[current] || canvas[current].color.r != canvas[index].color.r || canvas[current].color.g != canvas[index].color.g || canvas[current].color.b != canvas[index].color.b)
                 continue;
@@ -1789,6 +1796,7 @@ void bucketFill(){
                 back = (back + 1) % NUM_LEDS;
             }
         }
+        flushCanvas();
     }
 }
 
