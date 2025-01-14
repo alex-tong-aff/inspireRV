@@ -236,6 +236,7 @@ void brightness_control(void);
 void flushCanvas(void);
 void displayColorPalette(void);
 void colorPaletteSelection(color_t * selectedColor);
+void bucketFill(void);
 void logoDisplay(void);
 void red_screen(void);
 // below function reduce hex size
@@ -1176,10 +1177,11 @@ void painting_routine(void) {
                 break;
             }
             else if (JOY_8_pressed()) {
-                for (int i = 0; i < NUM_LEDS; i++) {
-                   canvas[i].layer = CLEARROUND_LAYER;
-                   canvas[i].color = clearground;
-                }
+                // for (int i = 0; i < NUM_LEDS; i++) {
+                //    canvas[i].layer = CLEARROUND_LAYER;
+                //    canvas[i].color = clearground;
+                // }
+                bucketFill();
                 flushCanvas();
             }
             else if (JOY_9_pressed()) {
@@ -1735,6 +1737,52 @@ void colorPaletteSelection(color_t * selectedColor) {
     printf("Selected color: R:%d G:%d B:%d\n", selectedColor->r, selectedColor->g,
         selectedColor->b);
     flushCanvas();
+}
+
+void bucketFill(){
+    color_t FillColor;
+    colorPaletteSelection(&FillColor);
+    int8_t index = 0;
+    while(1){
+        int8_t button = matrix_pressed_two();
+        if(JOY_9_pressed()) return;
+        if (button != no_button_pressed) {
+            index = button;
+            break;
+        }
+        Delay_Ms(200);
+    }
+    color_t currentColor = canvas[index].color;
+    int8_t q[NUM_LEDS] = {-1};//note: may optimize the size, if needed
+    uint8_t back = 1,front=0; 
+    bool visited[NUM_LEDS] = { false };
+    q[0] = index;
+    while(abs(back-front) > 0){
+        for(uint8_t i = front; i< back;i++){
+            int8_t current = q[i];
+            front = (front + 1) % NUM_LEDS;
+            if(visited[current] || canvas[current].color.r != currentColor.r || canvas[current].color.g != currentColor.g || canvas[current].color.b != currentColor.b)
+                continue;
+            visited[current] = true;
+            canvas[current].color = FillColor;
+            if(current - 8 >= 0){
+                q[back] = current - 8;
+                back = (back + 1) % NUM_LEDS;
+            }
+            if(current + 8 < NUM_LEDS){                
+                q[back] = current + 8;
+                back = (back + 1) % NUM_LEDS;
+            }
+            if(current % 8 != 0){                
+                q[back] = current - 1;
+                back = (back + 1) % NUM_LEDS;
+            }
+            if(current % 8 != 7){                
+                q[back] = current + 1;
+                back = (back + 1) % NUM_LEDS;
+            }
+        }
+    }
 }
 
 
