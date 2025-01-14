@@ -1750,7 +1750,7 @@ void colorPaletteSelection(color_t * selectedColor) {
 void bucketFill(){
     color_t FillColor;
     colorPaletteSelection(&FillColor);
-    int8_t index = 0;
+    uint8_t index = 0;
     Delay_Ms(500);
     while(1){
         int8_t button = matrix_pressed_two();
@@ -1762,21 +1762,19 @@ void bucketFill(){
         Delay_Ms(200);
     }
     color_t indexColor = canvas[index].color;
-    int8_t q[NUM_LEDS] = {-1};//note: may optimize the size, if needed
-    int8_t back = 1,front=0; 
-    bool visited[NUM_LEDS] = { false };
+    uint8_t q[NUM_LEDS] = {0};//note: may optimize the size, if needed
+    uint8_t back = 1,front=0; 
     q[0] = index;
-    while(abs(back-front) > 0){
-        int16_t end = back;
+    while(back!=front){
+        uint8_t end = back;
         if(back < front){
             end += NUM_LEDS;
         }
-        for(int16_t i = front; i < end;i++){
-            int8_t current = q[i%NUM_LEDS];
+        for(uint8_t i = front; i < end;i++){
+            uint8_t current = q[i%NUM_LEDS];
             front = (front + 1) % NUM_LEDS;
-            if(visited[current] || canvas[current].color.r != indexColor.r || canvas[current].color.g != indexColor.g || canvas[current].color.b != indexColor.b)
+            if(canvas[current].color.r != indexColor.r || canvas[current].color.g != indexColor.g || canvas[current].color.b != indexColor.b)
                 continue;
-            visited[current] = true;
             canvas[current].color = FillColor;
             if(current - 8 >= 0){
                 q[back] = current - 8;
