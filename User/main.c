@@ -1704,7 +1704,7 @@ void brightness_control(void)
         }
         Delay_Ms(200);
     }
-    
+    flushCanvas();
 }
 
 
