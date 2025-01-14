@@ -1649,7 +1649,7 @@ void brightness_control(void)
         // show the current brightness
         uint8_t i;
         for(i = 15;i>(ledDivider*2/5 + 7);i--){
-                set_color(i, (color_t){.r = 0, .g = 0, .b = 200});
+                set_color(i, (color_t){.r = 100, .g = 100, .b = 255});
         }
         for(;i>=8;i--){
                 set_color(i, (color_t){.r = 255, .g = 255, .b = 255});
