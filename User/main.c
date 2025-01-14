@@ -433,7 +433,7 @@ void rv_code_routine(void) {
                 toCodingSpace(currentPage);
             } else if (JOY_6_pressed()){
                 printf("Simulation workspace\n");
-                printf("Run Program\n");
+                // printf("Run Program\n");
                 rvCodeRun(0);
                 toCodingSpace(currentPage);
             } else if (JOY_7_pressed()) {
