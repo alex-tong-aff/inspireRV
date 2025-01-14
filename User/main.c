@@ -46,8 +46,10 @@
 // initialize file storage structure for 32kb/512pages
 // first 8 pages are used for status
 void init_storage(void);
+void load_data(uint16_t no, uint8_t * data, uint8_t sizeofdata, uint8_t is_icon);
 void save_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // save paint data to eeprom, paint 0 stored in page ?? (out of page 0 to 511)
-void load_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // load paint data from eeprom, paint 0 stored in page ?? (out of page 0 to 511)
+// void load_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // load paint data from eeprom, paint 0 stored in page ?? (out of page 0 to 511)
+#define load_paint(paint_no,data,is_icon) load_data(paint_no,(uint8_t*)data,sizeof_paint_data,is_icon)
 void set_page_status(uint16_t page_no, uint8_t status); // set page status to 0 or 1
 void reset_storage(void);   // reset to default storage status
 void print_status_storage(void);    // print storage data to console
@@ -55,8 +57,8 @@ uint8_t is_page_used(uint16_t page_no); // check if page[x] is already used
 uint8_t is_storage_initialized(void);   // check if already initialized data, aka init_status_data is set
 // save opcode data to eeprom, paint 0 stored in page ?? (out of page 0 to 511)
 void save_opCode(uint16_t opcode_no, uint8_t * data);
-void load_opCode(uint16_t opcode_no, uint8_t * data);
-
+// void load_opCode(uint16_t opcode_no, uint8_t * data);
+#define load_opCode(opcode_no,data) load_data(opcode_no,data,sizeof_opcode_data,0)
 
 uint16_t calculate_page_no(uint16_t paint_no, uint8_t is_icon);
 void any_paint_exist(uint8_t * paint_exist);
@@ -1394,52 +1396,75 @@ void save_opCode(uint16_t opcode_no, uint8_t * data) {
     printf("Opcode %d saved\n", opcode_no);
 }
 
-void load_paint(uint16_t paint_no, color_t * data, uint8_t is_icon) {
-    if (paint_no < 0 || paint_no > paint_addr_end) {
-        printf("Invalid paint number %d\n", paint_no);
+void load_data(uint16_t no, uint8_t * data, uint8_t sizeofdata, uint8_t is_icon) {
+        if (no < 0 || no > paint_addr_end) {
+        printf("Invalid paint number %d\n", no);
         printf("DEBUG: %d\n", __LINE__);
         while (1)
             ;
     }
-    uint16_t page_no_start = calculate_page_no(paint_no, is_icon);
-    printf("Loading paint_no %d from page %d, is_icon: %d\n", paint_no, page_no_start,
+    uint16_t page_no_start = calculate_page_no(no, is_icon);
+    printf("Loading no %d from page %d, is_icon: %d\n", no, page_no_start,
         is_icon);
     if (!is_page_used(page_no_start)) {
-        printf("Paint %d not found\n", paint_no);
+        printf("Paint %d not found\n", no);
         printf("DEBUG: %d\n", __LINE__);
         while (1)
             ;
     }
     i2c_result_e err = i2c_read_pages(EEPROM_ADDR, page_no_start * page_size,
-        I2C_REGADDR_2B, (uint8_t *)data, sizeof_paint_data);
+    I2C_REGADDR_2B, data, sizeofdata);
     printf("Load paint result: %d\n", err);
     Delay_Ms(3);
-    printf("Paint %d loaded\n", paint_no);
+    printf("Paint %d loaded\n", no);
 }
 
-void load_opCode(uint16_t opcode_no, uint8_t * data) {
-    if (opcode_no < 0 || opcode_no > page_status_addr_end) {
-        printf("Invalid paint number %d\n", opcode_no);
-        printf("DEBUG: %d\n", __LINE__);
-        while (1)
-            ;
-    }
-    uint16_t page_no_start = calculate_page_no(opcode_no, 0);
-    printf("Loading paint_no %d from page %d, is_icon: %d\n", opcode_no, page_no_start,0);
-    if (!is_page_used(page_no_start)) {
-        printf("Paint %d not found\n", opcode_no);
-        printf("DEBUG: %d\n", __LINE__);
-        while (1)
-            ;
-    }
-    i2c_result_e err = i2c_read_pages(EEPROM_ADDR, page_no_start * page_size,
-        I2C_REGADDR_2B, (uint8_t *)data, sizeof_opcode_data);
-    printf("Load paint result: %d\n", err);
-    Delay_Ms(3);
-    printf("Paint %d loaded\n", opcode_no);
-}
+// void load_paint(uint16_t paint_no, color_t * data, uint8_t is_icon) {
+//     if (paint_no < 0 || paint_no > paint_addr_end) {
+//         printf("Invalid paint number %d\n", paint_no);
+//         printf("DEBUG: %d\n", __LINE__);
+//         while (1)
+//             ;
+//     }
+//     uint16_t page_no_start = calculate_page_no(paint_no, is_icon);
+//     printf("Loading paint_no %d from page %d, is_icon: %d\n", paint_no, page_no_start,
+//         is_icon);
+//     if (!is_page_used(page_no_start)) {
+//         printf("Paint %d not found\n", paint_no);
+//         printf("DEBUG: %d\n", __LINE__);
+//         while (1)
+//             ;
+//     }
+//     i2c_result_e err = i2c_read_pages(EEPROM_ADDR, page_no_start * page_size,
+//         I2C_REGADDR_2B, (uint8_t *)data, sizeof_paint_data);
+//     printf("Load paint result: %d\n", err);
+//     Delay_Ms(3);
+//     printf("Paint %d loaded\n", paint_no);
+// }
 
-void any_paint_exist(uint8_t * paint_exist) {
+// void load_opCode(uint16_t opcode_no, uint8_t * data) {
+//     if (opcode_no < 0 || opcode_no > page_status_addr_end) {
+//         printf("Invalid paint number %d\n", opcode_no);
+//         printf("DEBUG: %d\n", __LINE__);
+//         while (1)
+//             ;
+//     }
+//     uint16_t page_no_start = calculate_page_no(opcode_no, 0);
+//     printf("Loading paint_no %d from page %d, is_icon: %d\n", opcode_no, page_no_start,0);
+//     if (!is_page_used(page_no_start)) {
+//         printf("Paint %d not found\n", opcode_no);
+//         printf("DEBUG: %d\n", __LINE__);
+//         while (1)
+//             ;
+//     }
+//     i2c_result_e err = i2c_read_pages(EEPROM_ADDR, page_no_start * page_size,
+//         I2C_REGADDR_2B, (uint8_t *)data, sizeof_opcode_data);
+//     printf("Load paint result: %d\n", err);
+//     Delay_Ms(3);
+//     printf("Paint %d loaded\n", opcode_no);
+// }
+
+void  any_paint_exist(uint8_t * paint_exist) {
     for (uint16_t _paint_page_no = paint_page_no;
          _paint_page_no < paint_page_no_max + paint_page_no;
          _paint_page_no += sizeof_paint_data_aspage) {
