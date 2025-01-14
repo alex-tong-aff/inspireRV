@@ -1591,7 +1591,7 @@ void choose_page(app_selected app_current, bool save_or_load) {
             }
         } else {
             if (JOY_9_pressed()){
-                printf("Exit %s\n", save_or_load ? "Saving" : "Loading");
+                // printf("Exit %s\n", save_or_load ? "Saving" : "Loading");
                 break;
             }
         }
@@ -1697,7 +1697,6 @@ void erase_all_paint_saves(void) {
 void display_brightness_bar(void){
         // show the current brightness
         uint8_t i;
-
         for(i = 15;i>((ledDivider)/5 + 7);i--){
                 set_color(i, (color_t){.r = 50, .g = 150, .b = 255});
         }
@@ -1819,7 +1818,7 @@ void bucketFill(){
                 back = (back + 1) % NUM_LEDS;
             }
         }
-        flushCanvas();
+        // flushCanvas();
     }
 }
 
