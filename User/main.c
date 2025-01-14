@@ -1483,6 +1483,7 @@ void choose_page(app_selected app_current, bool save_or_load) {
     while (1) {
         button = matrix_pressed_two();
         if (button != no_button_pressed ) {
+            if (button<0||button>7) continue;
             if(save_or_load) {
                 if (is_page_used(button * _sizeof_data_aspage + _page_no + _page_addr_begin)) {
                     printf("Page %d already used\n", button);
@@ -1643,7 +1644,6 @@ void brightness_control(void)
     // on 2nd row of the screen 
     // led divider = selected slot * 5
     // i.e. original led divider(10) is at the forth slot
-    flushCanvas();
     int8_t button = no_button_pressed;
     clear();
     while (1) {
