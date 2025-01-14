@@ -281,7 +281,7 @@ int main(void) {
         Delay_Ms(1);
     }
 
-    print_status_storage();
+    // print_status_storage();// Debug print
 
     //app_selected app = rv_paint;
 
@@ -1475,13 +1475,12 @@ void choose_page(app_selected app_current, bool save_or_load) {
 
     while (1) {
         button = matrix_pressed_two();
-        if (button != no_button_pressed 
-        && confirm_save_load(button, save_or_load)
-        ) {
+        if (button != no_button_pressed ) {
             if(save_or_load) {
                 if (is_page_used(button * _sizeof_data_aspage + _page_no + _page_addr_begin)) {
                     printf("Page %d already used\n", button);
                 }
+                if(!confirm_save_load(button, save_or_load)) continue;
                 printf("Selected page %d\n", button);
                 for (int i = 0; i < NUM_LEDS; i++){
                     set_color(i, canvas[i].color);
@@ -1500,6 +1499,7 @@ void choose_page(app_selected app_current, bool save_or_load) {
                     led_display_paint_page_status(app_current,false);
                     continue;
                 }
+                if (!confirm_save_load(button, save_or_load)) continue;
                 printf("Selected page %d\n", button);
                 if(app_current == rv_paint){
                     load_paint(button, led_array, 1);
@@ -1586,6 +1586,11 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     clear();
     printf("Confirm Save\n");
     //temp store original led
+    color_t temp_led_array[NUM_LEDS] = {0};
+
+    for (int i = 0; i < NUM_LEDS; i++) {
+        temp_led_array[i] = led_array[i];
+    }
     // show S if save_or_load else show L
     // orange for S, blue for L
     if (save_or_load) {
@@ -1609,7 +1614,11 @@ bool confirm_save_load(int8_t button,bool save_or_load){
         if(confirm_button == 8 || confirm_button == 15) break;
         Delay_Ms(200);
     }    
-    // WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
+    // restore original led 
+    for (int i = 0; i < NUM_LEDS; i++) {
+        led_array[i] = temp_led_array[i];
+    }
+    WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
     return (confirm_button == 8); // true: confirm, false: cancel
 
 }
