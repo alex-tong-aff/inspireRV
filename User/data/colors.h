@@ -54,12 +54,12 @@ void set_color(uint8_t led, color_t color) {
     led_array[led].b = smaller(color.b, color.b / ledDivider);
 }
 
-// void set_color_no_div(uint8_t led, color_t color) {
-//     //uint8_t divider = 20;
-//     led_array[led].r = color.r;
-//     led_array[led].g = color.g;
-//     led_array[led].b = color.b;
-// }
+void set_color_no_div(uint8_t led, color_t color) {
+    //uint8_t divider = 20;
+    led_array[led].r = color.r;
+    led_array[led].g = color.g;
+    led_array[led].b = color.b;
+}
 
 static inline void fill_color(color_t color) {
     for (int i = 0; i < NUM_LEDS; i++) {

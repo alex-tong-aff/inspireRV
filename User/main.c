@@ -1483,7 +1483,7 @@ void choose_page(app_selected app_current, bool save_or_load) {
                 if(!confirm_save_load(button, save_or_load)) continue;
                 printf("Selected page %d\n", button);
                 for (int i = 0; i < NUM_LEDS; i++){
-                    set_color(i, canvas[i].color);
+                    set_color_no_div(i, canvas[i].color);
                 }
                 if(app_current == rv_paint) save_paint(button, led_array, 1);
                 else if(app_current == rv_code) save_opCode(button, opCodeToStored);
