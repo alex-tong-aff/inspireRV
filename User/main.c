@@ -656,18 +656,9 @@ void rvCodeRun(uint8_t direct_result){
                         }
                         else{
                             penStatus = 1;
-                            if((var_line_storage[line_run]&0x04)==0x04)
-                                rvPendownColor.r = 36*rVariable;
-                            else
-                                rvPendownColor.r = 0;
-                            if((var_line_storage[line_run]&0x02)==0x02)
-                                rvPendownColor.g = 36*gVariable;
-                            else
-                                rvPendownColor.g = 0;
-                            if((var_line_storage[line_run]&0x01)==0x01)
-                                rvPendownColor.b = 36*bVariable;
-                            else
-                                rvPendownColor.b = 0;
+                                rvPendownColor.r = 36*rVariable * ((var_line_storage[line_run]&0x04)==0x04);
+                                rvPendownColor.g = 36*gVariable * ((var_line_storage[line_run]&0x02)==0x02);
+                                rvPendownColor.b = 36*bVariable * (var_line_storage[line_run]&0x01);
                             //printf("Leave Color R: %d, G: %d, B:%d\n",rvPendownColor.r, rvPendownColor.g, rvPendownColor.b);
                         }
                         break;
