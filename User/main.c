@@ -1767,11 +1767,9 @@ void bucketFill(){
     bool visited[NUM_LEDS] = { false };
     q[0] = index;
     while(abs(back-front) > 0){
-        int16_t end;
-        if(back > front){
-            end = back;
-        }else{
-            end = back + NUM_LEDS;
+        int16_t end = back;
+        if(back < front){
+            end += NUM_LEDS;
         }
         for(int16_t i = front; i < end;i++){
             int8_t current = q[i%NUM_LEDS];
