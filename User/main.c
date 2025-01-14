@@ -1029,18 +1029,20 @@ uint8_t opCodeExtraction(uint8_t received_message[8]){
     uint8_t extracted_code = 0;
     for (int i = 7; i > 2; i--) {
         if(received_message[i]>0)
-            if(i == 7){
-                extracted_code = extracted_code|0x10;
-            }
-            else if(i == 6){
-                extracted_code = extracted_code|0x08;
-            }
-            else if(i == 5)
-                extracted_code = extracted_code|0x04;
-            else if(i == 4)
-                extracted_code = extracted_code|0x02;
-            else if(i == 3)
-                extracted_code = extracted_code|0x01;
+            extracted_code = extracted_code|(0x01<<(i-3));
+            // if(i == 7){
+            //     extracted_code = extracted_code|0x10;
+            // }
+            // else if(i == 6){
+            //     extracted_code = extracted_code|0x08;
+            // }
+            // else if(i == 5)
+            //     extracted_code = extracted_code|0x04;
+            // else if(i == 4)
+            //     extracted_code = extracted_code|0x02;
+            // else if(i == 3)
+            //     extracted_code = extracted_code|0x01;
+    
     }
     return extracted_code;
 }
