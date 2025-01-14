@@ -1545,8 +1545,8 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
     }else{
         font_draw(font_L,(color_t){.r = 100, .g = 0, .b = 0}, 19); //third row center , forth column
     }
-
     if(app_current == rv_paint){
+        // uint8_t addr_begin = paint_addr_begin; uint8_t page_no = paint_page_no; uint8_t sizeof_data_as_page = sizeof_paint_data_aspage;
         for (uint16_t _paint_page_no = paint_page_no;
              _paint_page_no < paint_page_no_max + paint_page_no;
              _paint_page_no += sizeof_paint_data_aspage) {
@@ -1594,10 +1594,10 @@ bool confirm_save_load(int8_t button,bool save_or_load){
     // show S if save_or_load else show L
     // orange for S, blue for L
     if (save_or_load) {
-        font_draw(font_L,(color_t){.r = 100, .g = 0, .b = 0}, 21); //third row center , leftest
-    }else{
         // use font_5 for S , as they are same in this scale
         font_draw(font_5,(color_t){.r = 100, .g = 50, .b = 0}, 21);//third row cente, leftest
+    }else{
+        font_draw(font_L,(color_t){.r = 100, .g = 0, .b = 0}, 21); //third row center , leftest
     }
     // draw number
     // number at number list index 0-9 
