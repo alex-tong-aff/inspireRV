@@ -68,9 +68,10 @@ static inline void fill_color(color_t color) {
 }
 
 static inline void clear(void) {
-    for (int i = 0; i < NUM_LEDS; i++) {
-        set_color(i, (color_t){0, 0, 0});
-    }
+    fill_color((color_t){0, 0, 0});
+    // for (int i = 0; i < NUM_LEDS; i++) {
+    //     set_color(i, (color_t){0, 0, 0});
+    // }
 }
 
 static inline void fill_logo(void) {
