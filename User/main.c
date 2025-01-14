@@ -224,6 +224,9 @@ int8_t pointerLocation = 36;
 
 
 
+// Brightness control
+// relies on ledDivider from colors.h
+void brightness_control(void);
 
 
 
@@ -367,7 +370,7 @@ void rv_code_routine(void) {
                 //flushCanvas();
 
             } else if (JOY_2_pressed()){
-
+                brightness_control();
             } else if (JOY_3_pressed()){
                 // save paint
                 for (int _code_line = 0; _code_line <_TOTAL_CODE_LINE; _code_line++) {
@@ -1143,6 +1146,9 @@ void painting_routine(void) {
                 Delay_Ms(1000);
                 printf("Exit paint loading screen!\n");
             }
+            else if (JOY_2_pressed()) {
+                brightness_control();
+            }
             else if (JOY_3_pressed()) {
                 // save paint
                 printf("Exit paint mode, entering save\n");
@@ -1157,8 +1163,6 @@ void painting_routine(void) {
             else if (JOY_6_pressed()) {
                 colorPaletteSelection(&background);
             }
-
-
             else if (JOY_7_pressed()) {
                 // save paint
                 appChosen = rv_code;
@@ -1640,6 +1644,35 @@ void erase_all_paint_saves(void) {
     }
 }
 
+/// brightness control
+void brightness_control(void)
+{
+    // show the current brightness
+    // on 2nd row of the screen 
+    // led divider = selected B * 5 / 2
+    // i.e. original led divider(10) is at the forth slot
+    flushCanvas();
+    int8_t button = no_button_pressed;
+    while (1) {
+        // show the current brightness
+        uint8_t i;
+        for(i = 8;i<=(ledDivider*2/5 + 8);i++){
+                set_color(i, (color_t){.r = 0, .g = 0, .b = 200});
+        }
+        for(;i<=15;i++){
+                set_color(i, (color_t){.r = 255, .g = 255, .b = 255});
+        }   
+        
+        button = matrix_pressed_two();
+        if (button != no_button_pressed) {
+            if (button < 8 || button > 15) continue;
+            ledDivider = (button - 8) * 5 / 2;
+            printf("Brightness: %d\n", ledDivider);
+        }
+        Delay_Ms(200);
+        if(JOY_9_pressed()) break;
+    }
+}
 
 
 
