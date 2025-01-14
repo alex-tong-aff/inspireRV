@@ -108,6 +108,9 @@ Loading Page
 Saving Page
 9: Back
 
+Brightness Control Page
+9: Back
+
 ****
 For all variables, if not jump, all canbe used with Drawing
 E.g:
