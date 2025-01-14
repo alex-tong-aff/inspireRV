@@ -1559,21 +1559,21 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
     }else{
         return;
     }
-        for (uint16_t _page_no = page_no;
-             _page_no < page_no_max + page_no;
-             _page_no += sizeof_data_aspage) {
-            if (is_page_used(_page_no + addr_begin) &&
-                is_page_used(_page_no + addr_begin + 1) &&
-                is_page_used(_page_no + addr_begin + 2)) {
-                set_color((_page_no - page_no) / sizeof_data_aspage,
-                    color_savefile_exist);
-            }
-            else {
-                set_color((_page_no - page_no) / sizeof_data_aspage,
-                    color_savefile_empty);
-            }
-            //printf("Paint page number: %d\n", _paint_page_no);
+    for (uint16_t _page_no = page_no;
+            _page_no < page_no_max + page_no;
+            _page_no += sizeof_data_aspage) {
+        if (is_page_used(_page_no + addr_begin) &&
+            is_page_used(_page_no + addr_begin + 1) &&
+            is_page_used(_page_no + addr_begin + 2)) {
+            set_color((_page_no - page_no) / sizeof_data_aspage,
+                color_savefile_exist);
         }
+        else {
+            set_color((_page_no - page_no) / sizeof_data_aspage,
+                color_savefile_empty);
+        }
+        //printf("Paint page number: %d\n", _paint_page_no);
+    }
 
 
     WS2812BSimpleSend(LED_PINS, (uint8_t *)led_array, NUM_LEDS * 3);
