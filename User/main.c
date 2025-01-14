@@ -1028,8 +1028,10 @@ uint8_t opGroupExtraction(uint8_t received_message[8]){
 uint8_t opCodeExtraction(uint8_t received_message[8]){
     uint8_t extracted_code = 0;
     for (int i = 7; i > 2; i--) {
-        if(received_message[i]>0)
-            extracted_code = extracted_code|(0x01<<(i-3));
+        if(received_message[i]>0){
+            extracted_code = extracted_code|0x01;
+            extracted_code <<= 1;
+        }
             // if(i == 7){
             //     extracted_code = extracted_code|0x10;
             // }
