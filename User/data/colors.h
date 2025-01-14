@@ -49,12 +49,12 @@ uint8_t ledDivider = 10;
 #define smaller(x, y) ((x) < (y) ? (x) : (y))
 void set_color(uint8_t led, color_t color) {
     //uint8_t divider = 20;
-    // led_array[led].r = smaller(color.r, color.r / ledDivider);
-    // led_array[led].g = smaller(color.g, color.g / ledDivider);
-    // led_array[led].b = smaller(color.b, color.b / ledDivider);
-    led_array[led].r = color.r / ledDivider;
-    led_array[led].g = color.g / ledDivider;
-    led_array[led].b = color.b / ledDivider;
+    led_array[led].r = smaller(color.r, color.r / ledDivider);
+    led_array[led].g = smaller(color.g, color.g / ledDivider);
+    led_array[led].b = smaller(color.b, color.b / ledDivider);
+    // led_array[led].r = color.r / ledDivider;
+    // led_array[led].g = color.g / ledDivider;
+    // led_array[led].b = color.b / ledDivider;
 }
 
 void set_color_no_div(uint8_t led, color_t color) {
