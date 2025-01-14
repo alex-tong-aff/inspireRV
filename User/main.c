@@ -1610,6 +1610,7 @@ bool confirm_save_load(int8_t button,bool save_or_load){
         confirm_button = matrix_pressed_two();
         printf("Confirm button: %d %d\n", confirm_button, confirm_button == 8);
         if(confirm_button == 8 || confirm_button == 15) break;
+        if(JOY_9_pressed()) break;
         Delay_Ms(200);
     }    
     return (confirm_button == 8); // true: confirm, false: cancel
@@ -1658,14 +1659,14 @@ void brightness_control(void)
         set_color(0,(color_t){ .r=200, .g=0, .b=0});
         sendLedArray();
         button = matrix_pressed_two();
+        if(button==0) break;
         if (button != no_button_pressed) {
-            if(button==0) break;
+            if(JOY_9_pressed()) break;
             if (button < 8 || button > 15) continue;
             ledDivider = (button - 8) * 5 ;
             printf("Brightness: %d\n", ledDivider);
         }
         Delay_Ms(200);
-        if(JOY_9_pressed()) break;
     }
 }
 
@@ -1697,6 +1698,7 @@ void colorPaletteSelection(color_t * selectedColor) {
     displayColorPalette();
     while (1) {
         int8_t button = matrix_pressed_two();
+        if(JOY_9_pressed()) break;
         if (button != no_button_pressed) {
             *selectedColor = colors[button];
             break;
