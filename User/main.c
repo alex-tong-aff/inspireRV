@@ -389,22 +389,23 @@ void rv_code_routine(void) {
                    opCodeToStored[_code_line] = 0;
                    for (int i = 7; i >= 0; i--) {
                        if(opCodeStorage[_temp_page][_temp_line][i]>0)
-                            if(i == 7)
-                               opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x80;
-                            else if(i == 6)
-                               opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x40;
-                            else if(i == 5)
-                               opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x20;
-                            else if(i == 4)
-                               opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x10;
-                            else if(i == 3)
-                               opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x08;
-                            else if(i == 2)
-                              opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x04;
-                            else if(i == 1)
-                              opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x02;
-                            else if(i == 0)
-                              opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x01;
+                            opCodeToStored[_code_line] = opCodeToStored[_code_line]|(0x01<<i);
+                            // if(i == 7)
+                            //    opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x80;
+                            // else if(i == 6)
+                            //    opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x40;
+                            // else if(i == 5)
+                            //    opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x20;
+                            // else if(i == 4)
+                            //    opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x10;
+                            // else if(i == 3)
+                            //    opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x08;
+                            // else if(i == 2)
+                            //   opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x04;
+                            // else if(i == 1)
+                            //   opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x02;
+                            // else if(i == 0)
+                            //   opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x01;
                    }
                 }
                 printf("Exit Coding mode, entering save\n");
