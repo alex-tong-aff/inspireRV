@@ -1838,7 +1838,7 @@ void bucketFill(){
     uint8_t back = 1,front=0; 
     uint8_t iterations = 0;
     q[0] = index;
-    while(back!=front&&iterations<8){
+    while(back!=front&&iterations<14){// diagonal distance would be 14
         uint8_t end = back;
         if(back < front){
             end += NUM_LEDS;
