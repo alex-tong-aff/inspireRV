@@ -67,7 +67,7 @@ moving x-y mapping
 Coding Mode
 ```
 1: Load
-2:
+2: brightness
 3: save
 4: Programming space
 5: Result
@@ -79,7 +79,7 @@ Coding Mode
 Painting Mode
 ```
 1: Load
-2:
+2: brightness
 3: save
 4: Background color selection
 5: 
@@ -107,6 +107,19 @@ Loading Page
 
 Saving Page
 9: Back
+
+Brightness Control Page
+9: Back
+
+Color Selection Page
+1: Increase Red color
+2: Increase Green color
+3: Increase Blue color
+4: Decrease Red color
+5: Decrease Green color
+6: Decrease Blue color
+9: Back
+
 
 ****
 For all variables, if not jump, all canbe used with Drawing

@@ -47,11 +47,17 @@ color_t color_divide(color_t color, uint8_t divider) {
 }
 uint8_t ledDivider = 10;
 #define smaller(x, y) ((x) < (y) ? (x) : (y))
+uint8_t color_value_divide(uint8_t color){
+    return smaller(color, color / ledDivider);
+}
 void set_color(uint8_t led, color_t color) {
     //uint8_t divider = 20;
-    led_array[led].r = smaller(color.r, color.r / ledDivider);
-    led_array[led].g = smaller(color.g, color.g / ledDivider);
-    led_array[led].b = smaller(color.b, color.b / ledDivider);
+    // led_array[led].r = smaller(color.r, color.r / ledDivider);
+    // led_array[led].g = smaller(color.g, color.g / ledDivider);
+    // led_array[led].b = smaller(color.b, color.b / ledDivider);
+    led_array[led].r = color_value_divide(color.r);
+    led_array[led].g = color_value_divide(color.g);
+    led_array[led].b = color_value_divide(color.b);
 }
 
 void set_color_no_div(uint8_t led, color_t color) {
@@ -68,9 +74,10 @@ static inline void fill_color(color_t color) {
 }
 
 static inline void clear(void) {
-    for (int i = 0; i < NUM_LEDS; i++) {
-        set_color(i, (color_t){0, 0, 0});
-    }
+    fill_color((color_t){0, 0, 0});
+    // for (int i = 0; i < NUM_LEDS; i++) {
+    //     set_color(i, (color_t){0, 0, 0});
+    // }
 }
 
 static inline void fill_logo(void) {

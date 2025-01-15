@@ -156,6 +156,10 @@ void playAllMusic(void);
  * For example, `NOTE_E5, 8` represents an eighth note of E5.
  *
  */
+const int rvCodeNotes[] = {
+    NOTE_C4,NOTE_D4,NOTE_E4,NOTE_F4,NOTE_G4,NOTE_A4,NOTE_B4,NOTE_C5
+};
+
 const int melody[] = {
 
   NOTE_E5, 8, NOTE_D5, 8, NOTE_FS4, 4, NOTE_GS4, 4, 

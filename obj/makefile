@@ -1,8 +1,7 @@
 ################################################################################
-# MRS Version: 1.9.2
+# MRS Version: 2.1.0
 # Automatically-generated file. Do not edit!
 ################################################################################
-
 -include ../makefile.init
 
 RM := rm -rf
@@ -17,17 +16,17 @@ RM := rm -rf
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(strip $(ASM_UPPER_DEPS)),)
--include $(ASM_UPPER_DEPS)
-endif
-ifneq ($(strip $(ASM_DEPS)),)
--include $(ASM_DEPS)
-endif
 ifneq ($(strip $(S_DEPS)),)
 -include $(S_DEPS)
 endif
 ifneq ($(strip $(S_UPPER_DEPS)),)
 -include $(S_UPPER_DEPS)
+endif
+ifneq ($(strip $(ASM_DEPS)),)
+-include $(ASM_DEPS)
+endif
+ifneq ($(strip $(ASM_UPPER_DEPS)),)
+-include $(ASM_UPPER_DEPS)
 endif
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
@@ -38,35 +37,35 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 SECONDARY_FLASH += \
-InspireRV3.hex \
+inspireRV3.hex \
 
 SECONDARY_LIST += \
-InspireRV3.lst \
+inspireRV3.lst \
 
 SECONDARY_SIZE += \
-InspireRV3.siz \
+inspireRV3.siz \
 
 
 # All Target
-all: InspireRV3.elf secondary-outputs
+all: 
+	$(MAKE) --no-print-directory main-build 
+
+main-build: inspireRV3.elf secondary-outputs
 
 # Tool invocations
-InspireRV3.elf: $(OBJS) $(USER_OBJS)
-	@	@	riscv-none-embed-gcc -march=rv32ecxw -mabi=ilp32e -msmall-data-limit=0 -msave-restore -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common -Wunused -Wuninitialized  -g -T "D:\Alex Tong\InspireLab\Projects\RISCV\code\inspirematrix test\InspireRV3\Ld\Link.ld" -nostartfiles -Xlinker --gc-sections -Wl,-Map,"InspireRV3.map" --specs=nano.specs --specs=nosys.specs -o "InspireRV3.elf" $(OBJS) $(USER_OBJS) $(LIBS) -lprintf
-	@	@
-InspireRV3.hex: InspireRV3.elf
-	@	riscv-none-embed-objcopy -O ihex "InspireRV3.elf"  "InspireRV3.hex"
-	@	@
-InspireRV3.lst: InspireRV3.elf
-	@	riscv-none-embed-objdump --all-headers --demangle --disassemble -M xw "InspireRV3.elf" > "InspireRV3.lst"
-	@	@
-InspireRV3.siz: InspireRV3.elf
-	@	riscv-none-embed-size --format=berkeley "InspireRV3.elf"
-	@	@
+inspireRV3.elf: $(OBJS) $(USER_OBJS)
+	@	riscv-none-embed-gcc -march=rv32ecxw -mabi=ilp32e -msmall-data-limit=0 -msave-restore -fmax-errors=20 -Os -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common -Wunused -Wuninitialized -g -T "c:/Users/Tommy AU/mounriver-studio-projects/inspireRV3/Ld/Link.ld" -nostartfiles -Xlinker --gc-sections -Wl,-Map,"inspireRV3.map" --specs=nano.specs --specs=nosys.specs -o "inspireRV3.elf" $(OBJS) $(USER_OBJS) $(LIBS) -lprintf
+inspireRV3.hex: inspireRV3.elf
+	@	riscv-none-embed-objcopy -O ihex "inspireRV3.elf" "inspireRV3.hex"
+inspireRV3.lst: inspireRV3.elf
+	@	riscv-none-embed-objdump --all-headers --demangle --disassemble -M xw "inspireRV3.elf" > "inspireRV3.lst"
+inspireRV3.siz: inspireRV3.elf
+	riscv-none-embed-size --format=berkeley "inspireRV3.elf"
+
 # Other Targets
 clean:
-	-$(RM) $(ASM_UPPER_DEPS)$(OBJS)$(SECONDARY_FLASH)$(SECONDARY_LIST)$(SECONDARY_SIZE)$(ASM_DEPS)$(S_DEPS)$(S_UPPER_DEPS)$(C_DEPS) InspireRV3.elf
-	-@
+	-$(RM) $(OBJS)$(SECONDARY_FLASH)$(SECONDARY_LIST)$(SECONDARY_SIZE)$(S_DEPS)$(S_UPPER_DEPS)$(ASM_DEPS)$(ASM_UPPER_DEPS)$(C_DEPS) inspireRV3.elf
+
 secondary-outputs: $(SECONDARY_FLASH) $(SECONDARY_LIST) $(SECONDARY_SIZE)
 
 .PHONY: all clean dependents
