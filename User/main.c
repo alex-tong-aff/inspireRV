@@ -207,8 +207,8 @@ blue: tail
 
 void rv_code_routine(void);
 void rvCodeRun(uint8_t direct_result);
-uint8_t opGroupExtraction(uint8_t received_message[8]);
-uint8_t opCodeExtraction(uint8_t received_message[8]);
+// uint8_t opGroupExtraction(uint8_t received_message[8]);
+// uint8_t opCodeExtraction(uint8_t received_message[8]);
 uint8_t varExtraction(uint8_t received_message[8]);
 void toCodingSpace(uint8_t curr_page);
 const uint32_t timeout_flash = 200;
@@ -217,7 +217,7 @@ uint32_t timeout_line_code = 300;
 uint8_t funcRun[8] = {0};
 uint8_t numRun[8] = {0};
 uint8_t programStored[64] = {0};
-uint8_t opCodeStorage[4][7][8] = {0};
+uint8_t opCodeStorage[4][7] = {0};
 uint8_t opCodeToStored[28] ={0};
 uint8_t currentPage = 1;
 typedef struct rvCodeParts {
@@ -386,10 +386,11 @@ void rv_code_routine(void) {
                 for (int _code_line = 0; _code_line <_TOTAL_CODE_LINE; _code_line++) {
                    uint8_t _temp_page = _code_line/7;
                    uint8_t _temp_line = _code_line%7;
-                   opCodeToStored[_code_line] = 0;
-                   for (int i = 7; i >= 0; i--) {
-                       if(opCodeStorage[_temp_page][_temp_line][i]>0)
-                            opCodeToStored[_code_line] = opCodeToStored[_code_line]|(0x01<<i);
+                //    opCodeToStored[_code_line] = 0;
+                    //opCodeStorage 
+                    opCodeToStored[_code_line] = opCodeStorage[_temp_page][_temp_line];
+                //    for (int i = 7; i >= 0; i--) {
+                    //    if(opCodeStorage[_temp_page][_temp_line][i]>0)
                             // if(i == 7)
                             //    opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x80;
                             // else if(i == 6)
@@ -406,7 +407,7 @@ void rv_code_routine(void) {
                             //   opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x02;
                             // else if(i == 0)
                             //   opCodeToStored[_code_line] = opCodeToStored[_code_line]|0x01;
-                   }
+                //    }
                 }
                 printf("Exit Coding mode, entering save\n");
                 choose_save_page(rv_code);
@@ -444,9 +445,10 @@ void rv_code_routine(void) {
                 break;
             } else if (JOY_8_pressed()){
                 for (int _code_line = 0; _code_line <7; _code_line++) {
-                   for(int i = 7; i >= 0; i--){
-                       opCodeStorage[currentPage-1][_code_line][i]=0;
-                   }
+                //    for(int i = 7; i >= 0; i--){
+                    //    opCodeStorage[currentPage-1][_code_line][i]=0;
+                //    }
+                       opCodeStorage[currentPage-1][_code_line]=0;
                 }
                 for (int i = 8; i < NUM_LEDS; i++) {
                    canvas[i].layer = CLEARROUND_LAYER;
@@ -476,7 +478,8 @@ void rv_code_routine(void) {
                     canvas[user_input].color = opcodeColor;
                 }
                 //programStored[user_input] = 1;
-                opCodeStorage[currentPage-1][code_line][code_bit] = 1;
+                // opCodeStorage[currentPage-1][code_line][code_bit] = 1;
+                opCodeStorage[currentPage-1][code_line] |= 1<<code_bit;// set code bit to 1
             }
             else {
                 canvas[user_input].layer = CLEARROUND_LAYER;
@@ -484,7 +487,8 @@ void rv_code_routine(void) {
                 //programStored[user_input] = 0;
                 uint8_t code_line = (7-user_input/8);
                 uint8_t code_bit = (user_input%8);
-                opCodeStorage[currentPage-1][code_line][code_bit] = 0;
+                // opCodeStorage[currentPage-1][code_line][code_bit] = 0;
+                opCodeStorage[currentPage-1][code_line] &= ~(1<<code_bit);// set code bit to 0
             }
             printf("Canvas[%d] set to R:%d G:%d B:%d\n", user_input, canvas[user_input].color.r, canvas[user_input].color.g, canvas[user_input].color.b);
             flushCanvas();
@@ -534,9 +538,14 @@ void rvCodeRun(uint8_t direct_result){
     for (int _code_line = 0; _code_line <_TOTAL_CODE_LINE; _code_line++) {
         uint8_t _temp_page = _code_line/7;
         uint8_t _temp_line = _code_line%7;
-        opCode_line_storage[_code_line] = opCodeExtraction(opCodeStorage[_temp_page][_temp_line]);
-        opGrp_line_storage[_code_line] = opGroupExtraction(opCodeStorage[_temp_page][_temp_line]);
-        var_line_storage[_code_line] = varExtraction(opCodeStorage[_temp_page][_temp_line]);
+        uint8_t current_line = opCodeStorage[_temp_page][_temp_line];
+        // opCode_line_storage[_code_line] = opCodeExtraction(opCodeStorage[_temp_page][_temp_line]);
+        opCode_line_storage[_code_line] = current_line;
+        // opGrp_line_storage[_code_line] = opGroupExtraction(opCodeStorage[_temp_page][_temp_line]);
+        opGrp_line_storage[_code_line] = current_line&0x03;//get first last 2 bits
+        // var_line_storage[_code_line] = varExtraction(opCodeStorage[_temp_page][_temp_line]);
+        // extract top 3 bits as last 3 bits
+        var_line_storage[_code_line] = (current_line >> 7 & 0x1) | (current_line >> 6 & 0x2) | (current_line >> 5 & 0x4);
         //if(opCode_line_storage[_code_line] > 0)
         printf("OP: %d | Line: %d, code: %d, var: %d\n",opGrp_line_storage[_code_line], _code_line,opCode_line_storage[_code_line], var_line_storage[_code_line]);
     }
@@ -1028,8 +1037,8 @@ uint8_t opGroupExtraction(uint8_t received_message[8]){
 uint8_t opCodeExtraction(uint8_t received_message[8]){
     uint8_t extracted_code = 0;
     for (int i = 7; i > 2; i--) {
-        if(received_message[i]>0)
-            extracted_code = extracted_code|(0x01<<(i-3));
+        extracted_code = extracted_code|((received_message[i]>0)<<(i-3));
+        // if(received_message[i]>0)
             // if(i == 7){
             //     extracted_code = extracted_code|0x10;
             // }
@@ -1071,8 +1080,8 @@ void toCodingSpace(uint8_t curr_page){
    clear();
    for (int i = 0; i < 7; i++) {
        for (int j = 7; j >= 0; j--){
-           if(opCodeStorage[curr_page-1][i][j] >0){
-               canvas[(56-i*8+j)].layer = opCodeStorage[curr_page-1][i][j];
+           if(opCodeStorage[curr_page-1][i] & (1<<j)){
+               canvas[(56-i*8+j)].layer = opCodeStorage[curr_page-1][i]&(1<<j);
                if(j>2)
                    canvas[(56-i*8+j)].color = opcodeColor;
                else
@@ -1564,9 +1573,10 @@ void choose_page(app_selected app_current, bool save_or_load) {
                 } else if(app_current == rv_code){
                     load_opCode(button, opCodeToStored);
                     for (int i = 0; i < sizeof(opCodeToStored); i++) {
-                        for(int j=0;j<8;j++){
-                            opCodeStorage[i/7][i%7][j] = (opCodeToStored[i]>>j)&0x01;
-                        }
+                        opCodeStorage[i/7][i%7] = opCodeToStored[i];
+                        // for(int j=0;j<8;j++){
+                        //     opCodeStorage[i/7][i%7][j] = (opCodeToStored[i]>>j)&0x01;
+                        // }
                         // opCodeStorage[i/7][i%7][0] = (opCodeToStored[i] & 0x01);
                         // opCodeStorage[i/7][i%7][1] = ((opCodeToStored[i] & 0x02) >> 1);
                         // opCodeStorage[i/7][i%7][2] = ((opCodeToStored[i] & 0x04) >> 2);
