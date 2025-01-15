@@ -239,7 +239,7 @@ void brightness_control(void);
 // Color defines
 void flushCanvas(void);
 void displayColorPalette(int16_t offsetr, int16_t offsetg, int16_t offsetb);
-void colorPaletteSelection(color_t * selectedColor);
+int colorPaletteSelection(color_t * selectedColor);
 void bucketFill(void);
 void logoDisplay(void);
 void red_screen(void);
@@ -1773,7 +1773,7 @@ void displayColorPalette(int16_t offsetr, int16_t offsetg, int16_t offsetb) {
     // printf("Color palette displayed\n");
 }
 
-void colorPaletteSelection(color_t * selectedColor) {
+int colorPaletteSelection(color_t * selectedColor) {
     int16_t offsetr = 0, offsetg = 0, offsetb = 0;
     displayColorPalette(0,0,0);
     while (1) {
@@ -1798,12 +1798,13 @@ void colorPaletteSelection(color_t * selectedColor) {
             offsetb = (offsetb - 10) % 256;
         }
         else if(JOY_9_pressed()) {
-            break;
+            return 1;
         }else if (button != no_button_pressed) {
+            printf("Button %d pressed\n", button);
             *selectedColor =(color_t){
-            .r = abs(((int8_t)colors[button].r + offsetr)%256),
-            .g = abs(((int8_t)colors[button].g + offsetg)%256),
-            .b = abs(((int8_t)colors[button].b + offsetb)%256)
+            .r = led_array[button].r,
+            .g = led_array[button].g,
+            .b = led_array[button].b
         } ;
             break;
         }else{
@@ -1814,13 +1815,13 @@ void colorPaletteSelection(color_t * selectedColor) {
     printf("Selected color: R:%d G:%d B:%d\n", selectedColor->r, selectedColor->g,
         selectedColor->b);
     flushCanvas();
+    return 0;
 }
 
 void bucketFill(){
     color_t FillColor;
-    FillColor.r = (uint8_t)NULL;
-    colorPaletteSelection(&FillColor);
-    if(FillColor.r == (uint8_t)NULL) return;
+    int return_code = colorPaletteSelection(&FillColor);
+    if(return_code) return;
     uint8_t index = 0;
     Delay_Ms(500);
     while(1){
@@ -1835,8 +1836,9 @@ void bucketFill(){
     color_t indexColor = canvas[index].color;
     uint8_t q[NUM_LEDS] = {0};//note: may optimize the size, if needed
     uint8_t back = 1,front=0; 
+    uint8_t iterations = 0;
     q[0] = index;
-    while(back!=front){
+    while(back!=front&&iterations<8){
         uint8_t end = back;
         if(back < front){
             end += NUM_LEDS;
@@ -1864,6 +1866,7 @@ void bucketFill(){
                 back = (back + 1) % NUM_LEDS;
             }
         }
+        iterations++;
         // flushCanvas();
     }
 }
