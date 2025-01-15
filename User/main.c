@@ -1800,7 +1800,6 @@ int colorPaletteSelection(color_t * selectedColor) {
         else if(JOY_9_pressed()) {
             return 1;
         }else if (button != no_button_pressed) {
-            printf("Button %d pressed\n", button);
             *selectedColor =(color_t){
             .r = abs(((int16_t)colors[button].r + offsetr)%256),
             .g = abs(((int16_t)colors[button].g + offsetg)%256),
