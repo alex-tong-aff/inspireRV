@@ -1780,31 +1780,31 @@ int colorPaletteSelection(color_t * selectedColor) {
         Delay_Ms(200);
         int8_t button = matrix_pressed_two();
         if(JOY_1_pressed()) {
-            offsetr = (offsetr + 10) % 256;
+            offsetr = (offsetr + 10) % 250;
         }
         else if(JOY_2_pressed()){
-            offsetg = (offsetg + 10) % 256;
+            offsetg = (offsetg + 10) % 250;
         }
         else if(JOY_3_pressed()) {
-            offsetb = (offsetb + 10) % 256;
+            offsetb = (offsetb + 10) % 250;
         }
         else if(JOY_4_pressed()) {
-            offsetr = (offsetr - 10) % 256;
+            offsetr = (offsetr - 10) % 250;
         }
         else if(JOY_5_pressed()) {
-            offsetg = (offsetg - 10) % 256;
+            offsetg = (offsetg - 10) % 250;
         }
         else if(JOY_6_pressed()) {
-            offsetb = (offsetb - 10) % 256;
+            offsetb = (offsetb - 10) % 250;
         }
         else if(JOY_9_pressed()) {
             return 1;
         }else if (button != no_button_pressed) {
             printf("Button %d pressed\n", button);
             *selectedColor =(color_t){
-            .r = led_array[button].r,
-            .g = led_array[button].g,
-            .b = led_array[button].b
+            .r = abs(((int16_t)colors[button].r + offsetr)%256),
+            .g = abs(((int16_t)colors[button].g + offsetg)%256),
+            .b = abs(((int16_t)colors[button].b + offsetb)%256)
         } ;
             break;
         }else{
@@ -1819,7 +1819,7 @@ int colorPaletteSelection(color_t * selectedColor) {
 }
 
 void bucketFill(){
-    color_t FillColor;
+    color_t FillColor = {0,0,0};
     int return_code = colorPaletteSelection(&FillColor);
     if(return_code) return;
     uint8_t index = 0;
