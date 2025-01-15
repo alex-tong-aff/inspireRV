@@ -217,7 +217,7 @@ uint32_t timeout_line_code = 300;
 uint8_t funcRun[8] = {0};
 uint8_t numRun[8] = {0};
 uint8_t programStored[64] = {0};
-uint8_t opCodeStorage[4][7] = {0};
+uint8_t opCodeStorage[4][7] = {0};// 4 pages, 7 lines
 uint8_t opCodeToStored[28] ={0};
 uint8_t currentPage = 1;
 typedef struct rvCodeParts {
@@ -540,12 +540,11 @@ void rvCodeRun(uint8_t direct_result){
         uint8_t _temp_line = _code_line%7;
         uint8_t current_line = opCodeStorage[_temp_page][_temp_line];
         // opCode_line_storage[_code_line] = opCodeExtraction(opCodeStorage[_temp_page][_temp_line]);
-        opCode_line_storage[_code_line] = current_line;
+        opCode_line_storage[_code_line] = current_line >> 3;// get 3-7 bits
         // opGrp_line_storage[_code_line] = opGroupExtraction(opCodeStorage[_temp_page][_temp_line]);
-        opGrp_line_storage[_code_line] = current_line&0x03;//get first last 2 bits
+        opGrp_line_storage[_code_line] = current_line >> 6;//get 6-7 bits
         // var_line_storage[_code_line] = varExtraction(opCodeStorage[_temp_page][_temp_line]);
-        // extract top 3 bits as last 3 bits
-        var_line_storage[_code_line] = (current_line >> 7 & 0x1) | (current_line >> 6 & 0x2) | (current_line >> 5 & 0x4);
+        var_line_storage[_code_line] = current_line & 0b00000111;// get 0-2 bits
         //if(opCode_line_storage[_code_line] > 0)
         printf("OP: %d | Line: %d, code: %d, var: %d\n",opGrp_line_storage[_code_line], _code_line,opCode_line_storage[_code_line], var_line_storage[_code_line]);
     }
