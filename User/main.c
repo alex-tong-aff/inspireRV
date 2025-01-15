@@ -1837,7 +1837,13 @@ void bucketFill(){
     uint8_t back = 1,front=0; 
     uint8_t iterations = 0;
     q[0] = index;
-    while(back!=front&&iterations<15){// diagonal distance would be 15
+    // there are no visit array to reduce code and ram usage
+    // program will run infinitely if fill with same color
+    // Therefore, max limit of iterations of <15 is set
+    // as diagonal distance of 8x8 is 14,
+    // it requires at most 15 iterations to fill all
+    // this would fix the same color fill issue with little code
+    while(back!=front&&iterations<15){// diagonal distance would be 14
         uint8_t end = back;
         if(back < front){
             end += NUM_LEDS;
