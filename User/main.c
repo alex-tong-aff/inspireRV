@@ -1020,55 +1020,55 @@ void rvCodeRun(uint8_t direct_result){
     }
 }
 
-uint8_t opGroupExtraction(uint8_t received_message[8]){
-    uint8_t opcodeGroup = 0;
-    for (int i = 7; i > 5; i--) {
-        if(received_message[i]>0)
-            if(i == 7){
-                opcodeGroup = opcodeGroup|0x02;
-            }
-            else if(i == 6){
-                opcodeGroup = opcodeGroup|0x01;
-            }
-    }
-    return opcodeGroup;
-}
+// uint8_t opGroupExtraction(uint8_t received_message[8]){
+//     uint8_t opcodeGroup = 0;
+//     for (int i = 7; i > 5; i--) {
+//         if(received_message[i]>0)
+//             if(i == 7){
+//                 opcodeGroup = opcodeGroup|0x02;
+//             }
+//             else if(i == 6){
+//                 opcodeGroup = opcodeGroup|0x01;
+//             }
+//     }
+//     return opcodeGroup;
+// }
 
-uint8_t opCodeExtraction(uint8_t received_message[8]){
-    uint8_t extracted_code = 0;
-    for (int i = 7; i > 2; i--) {
-        extracted_code = extracted_code|((received_message[i]>0)<<(i-3));
-        // if(received_message[i]>0)
-            // if(i == 7){
-            //     extracted_code = extracted_code|0x10;
-            // }
-            // else if(i == 6){
-            //     extracted_code = extracted_code|0x08;
-            // }
-            // else if(i == 5)
-            //     extracted_code = extracted_code|0x04;
-            // else if(i == 4)
-            //     extracted_code = extracted_code|0x02;
-            // else if(i == 3)
-            //     extracted_code = extracted_code|0x01;
+// uint8_t opCodeExtraction(uint8_t received_message[8]){
+//     uint8_t extracted_code = 0;
+//     for (int i = 7; i > 2; i--) {
+//         extracted_code = extracted_code|((received_message[i]>0)<<(i-3));
+//         // if(received_message[i]>0)
+//             // if(i == 7){
+//             //     extracted_code = extracted_code|0x10;
+//             // }
+//             // else if(i == 6){
+//             //     extracted_code = extracted_code|0x08;
+//             // }
+//             // else if(i == 5)
+//             //     extracted_code = extracted_code|0x04;
+//             // else if(i == 4)
+//             //     extracted_code = extracted_code|0x02;
+//             // else if(i == 3)
+//             //     extracted_code = extracted_code|0x01;
     
-    }
-    return extracted_code;
-}
+//     }
+//     return extracted_code;
+// }
 
-uint8_t varExtraction(uint8_t received_message[8]){
-    uint8_t extracted_var = 0;
-    for (int i = 2; i >= 0; i--) {
-        if(received_message[i]>0)
-            if(i == 2)
-                extracted_var = extracted_var|0x04;
-            else if(i == 1)
-                extracted_var = extracted_var|0x02;
-            else if(i == 0)
-                extracted_var = extracted_var|0x01;
-    }
-    return extracted_var;
-}
+// uint8_t varExtraction(uint8_t received_message[8]){
+//     uint8_t extracted_var = 0;
+//     for (int i = 2; i >= 0; i--) {
+//         if(received_message[i]>0)
+//             if(i == 2)
+//                 extracted_var = extracted_var|0x04;
+//             else if(i == 1)
+//                 extracted_var = extracted_var|0x02;
+//             else if(i == 0)
+//                 extracted_var = extracted_var|0x01;
+//     }
+//     return extracted_var;
+// }
 void toCodingSpace(uint8_t curr_page){
    printf("Coding workspace Page %d\n", curr_page);
    /*for(int i = 63; i >0; i--){
