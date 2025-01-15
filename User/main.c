@@ -1818,7 +1818,9 @@ void colorPaletteSelection(color_t * selectedColor) {
 
 void bucketFill(){
     color_t FillColor;
+    FillColor.r = (uint8_t)NULL;
     colorPaletteSelection(&FillColor);
+    if(FillColor.r == (uint8_t)NULL) return;
     uint8_t index = 0;
     Delay_Ms(500);
     while(1){
