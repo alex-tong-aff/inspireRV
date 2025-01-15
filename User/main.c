@@ -46,11 +46,11 @@
 // initialize file storage structure for 32kb/512pages
 // first 8 pages are used for status
 void init_storage(void);
-void save_data(uint16_t no, uint8_t * data, uint8_t sizeof_data_aspage,uint8_t sizeof_data, uint8_t is_icon);
+void save_data(uint16_t no, uint8_t * data, uint8_t sizeof_data_aspage,uint8_t sizeof_data, uint8_t addr_end, uint8_t is_icon);
 void load_data(uint16_t no, uint8_t * data, uint8_t sizeof_data, uint8_t is_icon);
 // void save_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // save paint data to eeprom, paint 0 stored in page ?? (out of page 0 to 511)
 // void load_paint(uint16_t paint_no, color_t * data, uint8_t is_icon);    // load paint data from eeprom, paint 0 stored in page ?? (out of page 0 to 511)
-#define save_paint(paint_no,data,is_icon) save_data(paint_no,(uint8_t*)data,sizeof_paint_data_aspage,sizeof_paint_data,is_icon)
+#define save_paint(paint_no,data,is_icon) save_data(paint_no,(uint8_t*)data,sizeof_paint_data_aspage,sizeof_paint_data,paint_addr_end,is_icon)
 #define load_paint(paint_no,data,is_icon) load_data(paint_no,(uint8_t*)data,sizeof_paint_data,is_icon)
 void set_page_status(uint16_t page_no, uint8_t status); // set page status to 0 or 1
 void reset_storage(void);   // reset to default storage status
@@ -60,7 +60,7 @@ uint8_t is_storage_initialized(void);   // check if already initialized data, ak
 // save opcode data to eeprom, paint 0 stored in page ?? (out of page 0 to 511)
 // void save_opCode(uint16_t opcode_no, uint8_t * data);
 // void load_opCode(uint16_t opcode_no, uint8_t * data);
-#define save_opCode(opcode_no,data) save_data(opcode_no,data,sizeof_opcode_data_aspage,sizeof_opcode_data,0)
+#define save_opCode(opcode_no,data) save_data(opcode_no,data,sizeof_opcode_data_aspage,sizeof_opcode_data,opcode_addr_end,0)
 #define load_opCode(opcode_no,data) load_data(opcode_no,data,sizeof_opcode_data,0)
 
 uint16_t calculate_page_no(uint16_t paint_no, uint8_t is_icon);
@@ -1362,8 +1362,8 @@ uint16_t calculate_page_no(uint16_t paint_no, uint8_t is_icon) {
     }
 }
 
-void save_data(uint16_t no, uint8_t * data, uint8_t sizeof_data_aspage,uint8_t sizeof_data, uint8_t is_icon){
-    if (no < 0 || no > paint_addr_end) {
+void save_data(uint16_t no, uint8_t * data, uint8_t sizeof_data_aspage,uint8_t sizeof_data, uint8_t addr_end, uint8_t is_icon){
+    if (no < 0 || no > addr_end) {
         printf("Invalid paint number %d\n", no);
         printf("DEBUG: %d\n", __LINE__);
         while (1)
@@ -1637,8 +1637,12 @@ void led_display_paint_page_status(app_selected app_current,bool save_or_load) {
             _page_no < page_no_max + page_no;
             _page_no += sizeof_data_aspage) {
         if (is_page_used(_page_no + addr_begin) &&
-            is_page_used(_page_no + addr_begin + 1) &&
-            is_page_used(_page_no + addr_begin + 2)) {
+        (
+            app_current == rv_code || // if rv_code, only check first one
+            (is_page_used(_page_no + addr_begin + 1) &&
+            is_page_used(_page_no + addr_begin + 2))
+        )
+        ) {
             set_color((_page_no - page_no) / sizeof_data_aspage,
                 color_savefile_exist);
         }
