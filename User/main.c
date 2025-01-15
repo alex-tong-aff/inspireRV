@@ -209,7 +209,7 @@ void rv_code_routine(void);
 void rvCodeRun(uint8_t direct_result);
 // uint8_t opGroupExtraction(uint8_t received_message[8]);
 // uint8_t opCodeExtraction(uint8_t received_message[8]);
-uint8_t varExtraction(uint8_t received_message[8]);
+// uint8_t varExtraction(uint8_t received_message[8]);
 void toCodingSpace(uint8_t curr_page);
 const uint32_t timeout_flash = 200;
 uint32_t timeout_var_code = 150;
@@ -1544,7 +1544,10 @@ void choose_page(app_selected app_current, bool save_or_load) {
                 if (is_page_used(button * _sizeof_data_aspage + _page_no + _page_addr_begin)) {
                     printf("Page %d already used\n", button);
                 }
-                if(!confirm_save_load(button, save_or_load)) continue;
+                if(!confirm_save_load(button, save_or_load)) {
+                    led_display_paint_page_status(app_current, save_or_load);
+                    continue;
+                }
                 printf("Selected page %d\n", button);
                 for (int i = 0; i < NUM_LEDS; i++){
                     set_color_no_div(i, canvas[i].color);
@@ -1563,7 +1566,10 @@ void choose_page(app_selected app_current, bool save_or_load) {
                     led_display_paint_page_status(app_current,false);
                     continue;
                 }
-                if (!confirm_save_load(button, save_or_load)) continue;
+                if(!confirm_save_load(button, save_or_load)) {
+                    led_display_paint_page_status(app_current, save_or_load);
+                    continue;
+                }
                 printf("Selected page %d\n", button);
                 if(app_current == rv_paint){
                     load_paint(button, led_array, 1);
